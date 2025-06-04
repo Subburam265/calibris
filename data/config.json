@@ -1,0 +1,12 @@
+{
+  "device_id": 1,
+  "calibration_factor": 214.0950,
+  "tare_offset": 73047,
+  "safe_mode": false,
+  "location": {
+    "site_name": "Chennai_Depot_3",
+    "latitude": 13.0827,
+    "longitude": 80.2707,
+    "last_updated": "2025-11-26"
+  }
+}
