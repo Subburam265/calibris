@@ -1,0 +1,16 @@
+/dts-v1/;
+/plugin/;
+
+/{
+    compatible = "rockchip,rv1106";
+
+    fragment@0 {
+        target-path = "/i2c@ff460000";          // i2c3 controller (currently disabled)
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&i2c3m0_xfer>;         // Uses GPIO2_A6 (SCL) & GPIO2_A7 (SDA) Mode 0
+            clock-frequency = <100000>;         // 100 kHz; change to <400000> if you want Fast Mode
+        };
+    };
+};

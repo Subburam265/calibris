@@ -1,0 +1,15 @@
+53f7faf93492bd7495647d0ec4d1cbcec403b1c6a588326638eaa3677178a90e && 4101b063f3d5f48890f0ff2e69208c575d7f94d8497093b3d967a07d17735a63
+Failed to stop measure_weight.service: Interactive authentication required.
+See system logs and 'systemctl status measure_weight.service' for details.
+Failed to open the i2c bus: Permission denied
+Failed to initialize LCD.
+53f7faf93492bd7495647d0ec4d1cbcec403b1c6a588326638eaa3677178a90e && 4101b063f3d5f48890f0ff2e69208c575d7f94d8497093b3d967a07d17735a63
+Failed to stop measure_weight.service: Interactive authentication required.
+See system logs and 'systemctl status measure_weight.service' for details.
+Failed to open the i2c bus: Permission denied
+Failed to initialize LCD.
+53f7faf93492bd7495647d0ec4d1cbcec403b1c6a588326638eaa3677178a90e && 4101b063f3d5f48890f0ff2e69208c575d7f94d8497093b3d967a07d17735a63
+Failed to stop measure_weight.service: Interactive authentication required.
+See system logs and 'systemctl status measure_weight.service' for details.
+Failed to open the i2c bus: Permission denied
+Failed to initialize LCD.
