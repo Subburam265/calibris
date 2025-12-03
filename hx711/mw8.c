@@ -4,15 +4,25 @@
 #include <gpiod.h>
 #include <math.h>
 #include <fcntl.h>
-#include <stdbool.h> // For boolean type
+#include <stdbool.h>
+#include <string.h>
 #include "hx711.h"
-#include "lcd.h" // Your LCD header file
+#include "lcd.h"
+#include "cJSON.h" // include cJSON
 
-// --- GPIO and Delay Functions (keep these the same) ---
+#define CONFIG_JSON_PATH "/home/pico/calibris/data/config.json"
+
+// Structure to hold config values
+typedef struct {
+    float calibration_factor;
+    long tare_offset;
+} config_struct;
+
+// --- GPIO and Delay Functions ---
 struct gpiod_chip* chip;
 struct gpiod_line* dout_line;
 struct gpiod_line* sck_line;
-struct gpiod_line* tare_line; // Line for the tare button
+struct gpiod_line* tare_line;
 
 void my_gpio_write(int pin, int value) {
     gpiod_line_set_value(sck_line, value);
@@ -30,10 +40,75 @@ void my_delay_ms(unsigned int ms) {
     usleep(ms * 1000);
 }
 
+// --- JSON Config Read/Write ---
+// Read calibration and tare from config.json
+int read_config_json(const char *path, config_struct *out) {
+    FILE *fp = fopen(path, "r");
+    if (!fp) {
+        perror("Error opening config.json");
+        return 1;
+    }
+    fseek(fp, 0, SEEK_END);
+    long length = ftell(fp);
+    rewind(fp);
+    char *data = malloc(length + 1);
+    fread(data, 1, length, fp);
+    data[length] = '\0';
+    fclose(fp);
+
+    cJSON *j = cJSON_Parse(data);
+    free(data);
+
+    if (!j) return 2;
+    cJSON *calib = cJSON_GetObjectItem(j, "calibration_factor");
+    cJSON *tare = cJSON_GetObjectItem(j, "tare_offset");
+    if (!cJSON_IsNumber(calib) || !cJSON_IsNumber(tare)) {
+        cJSON_Delete(j);
+        return 3;
+    }
+    out->calibration_factor = (float)calib->valuedouble;
+    out->tare_offset = (long)tare->valuedouble;
+    cJSON_Delete(j);
+    return 0;
+}
+
+// Write calibration factor and tare offset to config.json, preserving all other fields
+int write_config_json(const char *path, float calibration_factor, long tare_offset) {
+    FILE *fp = fopen(path, "r+");
+    if (!fp) {
+        perror("Error opening config.json for update");
+        return 1;
+    }
+    fseek(fp, 0, SEEK_END);
+    long length = ftell(fp);
+    rewind(fp);
+    char *data = malloc(length + 1);
+    fread(data, 1, length, fp);
+    data[length] = '\0';
+
+    cJSON *j = cJSON_Parse(data);
+    free(data);
+    if (!j) {
+        fclose(fp);
+        return 2;
+    }
+    cJSON_ReplaceItemInObject(j, "calibration_factor", cJSON_CreateNumber(calibration_factor));
+    cJSON_ReplaceItemInObject(j, "tare_offset", cJSON_CreateNumber(tare_offset));
+
+    char *out = cJSON_Print(j);
+    fseek(fp, 0, SEEK_SET);
+    fwrite(out, 1, strlen(out), fp);
+    fflush(fp);
+    ftruncate(fileno(fp), strlen(out));
+    fclose(fp);
+    cJSON_Delete(j);
+    free(out);
+    return 0;
+}
+
 // --- Helper function for Taring ---
-// This function contains the logic for performing a tare,
-// displaying messages, and saving the new offset.
-void perform_tare(hx711_t* scale, const char* tare_file) {
+// No file writing, uses config.json
+void perform_tare(hx711_t* scale) {
     printf("\n>>> Re-Taring... do not touch the scale. <<<\n");
     lcd_clear();
     lcd_set_cursor(0, 0);
@@ -44,17 +119,13 @@ void perform_tare(hx711_t* scale, const char* tare_file) {
     hx711_tare(scale, 20);
     long new_offset = hx711_get_offset(scale);
 
-    FILE* file_ptr = fopen(tare_file, "w");
-    if (file_ptr != NULL) {
-        fprintf(file_ptr, "%ld", new_offset);
-        fclose(file_ptr);
+    if (write_config_json(CONFIG_JSON_PATH, scale->scale, new_offset) == 0) {
         printf(">>> Tare complete. New offset %ld saved. <<<\n", new_offset);
     } else {
-        perror("Error saving tare file");
+        perror("Error saving tare to config.json");
     }
-    my_delay_ms(1500); // Give user time to see the message
+    my_delay_ms(1500);
 }
-
 
 // --- Main Program ---
 int main() {
@@ -63,14 +134,11 @@ int main() {
     const int DOUT_PIN = 5;
     const int SCK_PIN = 4;
     const int TARE_PIN = 0; // GPIO2_A0_d corresponds to line offset 0 on gpiochip2
-    const char* CALIBRATION_FILE = "calibration.txt";
-    const char* TARE_FILE = "tare.txt";
     const char* I2C_BUS = "/dev/i2c-3";
     const int I2C_ADDR = 0x27;
 
-    float current_scale_factor = 1.0;
+    float current_scale_factor = 1.0f;
     long tare_offset = 0;
-    FILE* file_ptr;
 
     // --- Set up non-blocking keyboard input ---
     int original_flags = fcntl(STDIN_FILENO, F_GETFL, 0);
@@ -81,9 +149,8 @@ int main() {
     if (!chip) { perror("Error opening GPIO chip"); return 1; }
     dout_line = gpiod_chip_get_line(chip, DOUT_PIN);
     sck_line = gpiod_chip_get_line(chip, SCK_PIN);
-    tare_line = gpiod_chip_get_line(chip, TARE_PIN); // Get the tare line
+    tare_line = gpiod_chip_get_line(chip, TARE_PIN);
 
-    // Request all GPIO lines
     if (gpiod_line_request_input(dout_line, "hx711_dout") < 0 ||
         gpiod_line_request_output(sck_line, "hx711_sck", 0) < 0 ||
         gpiod_line_request_input(tare_line, "tare_button") < 0) {
@@ -99,6 +166,7 @@ int main() {
         gpiod_chip_close(chip);
         return 1;
     }
+    
     lcd_clear();
     lcd_set_cursor(0, 0);
     lcd_send_string("Scale Starting..");
@@ -108,27 +176,20 @@ int main() {
     hx711_t scale;
     hx711_init(&scale, DOUT_PIN, SCK_PIN, my_gpio_write, my_gpio_read, my_delay_us, my_delay_ms);
 
-    // --- Load settings (same as before) ---
-    printf("Loading settings...\n");
-    file_ptr = fopen(CALIBRATION_FILE, "r");
-    if (file_ptr != NULL) {
-        fscanf(file_ptr, "%f", &current_scale_factor);
-        fclose(file_ptr);
-        if (current_scale_factor == 0.0) { current_scale_factor = 1.0; }
+    // A
+    // --- Load settings from config.json ---
+    printf("Loading settings from config.json...\n");
+    config_struct conf;
+    if (read_config_json(CONFIG_JSON_PATH, &conf) == 0) {
+        current_scale_factor = conf.calibration_factor;
+        tare_offset = conf.tare_offset;
         hx711_set_scale(&scale, current_scale_factor);
-        printf(" -> Calibration factor loaded: %.4f\n", current_scale_factor);
-    } else {
-        printf(" -> Calibration file not found. Please calibrate.\n");
-        hx711_set_scale(&scale, 1.0);
-    }
-    file_ptr = fopen(TARE_FILE, "r");
-    if (file_ptr != NULL) {
-        fscanf(file_ptr, "%ld", &tare_offset);
-        fclose(file_ptr);
         hx711_set_offset(&scale, tare_offset);
+        printf(" -> Calibration factor loaded: %.4f\n", current_scale_factor);
         printf(" -> Tare offset loaded: %ld\n", tare_offset);
     } else {
-        printf(" -> Tare file not found. Performing initial tare...\n");
+        printf(" -> config.json not found/invalid. Please calibrate.\n");
+        hx711_set_scale(&scale, 1.0);
         hx711_tare(&scale, 20);
     }
 
@@ -143,11 +204,10 @@ int main() {
     while (1) {
         bool action_taken = false;
 
-        // Check for tare button press (GPIO)
+        // Check for tare button (GPIO)
         if (gpiod_line_get_value(tare_line) == 1) {
-            perform_tare(&scale, TARE_FILE);
+            perform_tare(&scale);
             action_taken = true;
-            // Debounce: wait here until the button is released
             while (gpiod_line_get_value(tare_line) == 1) {
                 my_delay_ms(50);
             }
@@ -156,12 +216,12 @@ int main() {
         // Check for keyboard commands
         char c = -1;
         if (read(STDIN_FILENO, &c, 1) > 0) {
-            action_taken = true; // Any key press will trigger a screen refresh
+            action_taken = true;
             if (c == 't') {
-                perform_tare(&scale, TARE_FILE);
+                perform_tare(&scale);
             }
             else if (c == 'c') {
-                // Temporarily make stdin blocking for user input
+                // Temporarily make stdin blocking
                 fcntl(STDIN_FILENO, F_SETFL, original_flags);
 
                 printf("\n--- Calibration --- \n");
@@ -172,13 +232,12 @@ int main() {
                 printf("Enter the known weight in grams (e.g., 100.0): ");
                 float known_weight_g;
                 scanf("%f", &known_weight_g);
-                // Clear the rest of the input buffer (the Enter key)
                 while(getchar() != '\n' && getchar() != EOF);
 
                 printf("Place the %.2fg weight on the scale and press Enter.", known_weight_g);
                 lcd_set_cursor(1, 0);
                 lcd_send_string("Place weight...");
-                getchar(); // Wait for user to press Enter
+                getchar();
 
                 printf("Measuring... please wait.\n");
                 lcd_set_cursor(1, 0);
@@ -191,14 +250,11 @@ int main() {
                     current_scale_factor = (float)(raw_reading - tare_offset) / known_weight_g;
                     hx711_set_scale(&scale, current_scale_factor);
 
-                    file_ptr = fopen(CALIBRATION_FILE, "w");
-                    if (file_ptr != NULL) {
-                        fprintf(file_ptr, "%.4f", current_scale_factor);
-                        fclose(file_ptr);
-                    }
+                    // Write both calibration factor and tare to config.json
+                    write_config_json(CONFIG_JSON_PATH, current_scale_factor, tare_offset);
+
                     printf("\n--- Calibration Complete! ---\n");
                     printf("New scale factor is: %.4f\n", current_scale_factor);
-
                     lcd_clear();
                     lcd_set_cursor(0, 0);
                     lcd_send_string("Calib. Complete!");
@@ -209,20 +265,16 @@ int main() {
                     lcd_send_string("Error: Weight=0");
                     my_delay_ms(2000);
                 }
-
-                // Restore non-blocking input for the main loop
                 fcntl(STDIN_FILENO, F_SETFL, original_flags | O_NONBLOCK);
             }
         }
 
-        // If an action was taken (tare or calibrate), restore the main display
-        if (action_taken) {
+	if (action_taken) {
             lcd_clear();
             lcd_set_cursor(0, 0);
             lcd_send_string("Weight:");
         }
 
-        // --- Continuously update weight reading on console and LCD ---
         float weight = hx711_get_units(&scale, 5);
         if (fabsf(weight) < 0.5) weight = 0.0;
 
@@ -232,7 +284,7 @@ int main() {
         char lcd_buffer[17];
         snprintf(lcd_buffer, sizeof(lcd_buffer), "%8.2f g", weight);
         lcd_set_cursor(1, 0);
-        lcd_send_string("                "); // Clear the line first
+        lcd_send_string("                ");
         lcd_set_cursor(1, 0);
         lcd_send_string(lcd_buffer);
 
@@ -240,11 +292,10 @@ int main() {
     }
 
     // --- Cleanup ---
-    // This part is unreachable in an infinite loop, but good practice to have
     printf("\nCleaning up and exiting.\n");
     gpiod_line_release(dout_line);
     gpiod_line_release(sck_line);
-    gpiod_line_release(tare_line); // Release the new line
+    gpiod_line_release(tare_line);
     gpiod_chip_close(chip);
     lcd_clear();
     lcd_set_cursor(0,0);
@@ -252,4 +303,4 @@ int main() {
     lcd_close();
 
     return 0;
-} //yo
+}
