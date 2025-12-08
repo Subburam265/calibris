@@ -1,13 +1,17 @@
 /**
  * Tamper Log Library for Calibris
- * * A reusable library for logging tamper events with blockchain support. 
+ *
+ * A reusable library for logging tamper events with blockchain support.
  * Can be used by any tamper detection code (magnetic, firmware, weight drift, etc.)
  *
  * Features:
  * - Blockchain hash chain (prev_hash, curr_hash)
- * - Auto-reads device config from config.json
- * - Updates safe_mode in config.json
- * - Controls measure_weight.service
+ * - Auto-reads device config from config.json (read-only)
+ * - Logs tamper events to SQLite database
+ *
+ * NOTE: This library only handles logging. It does NOT:
+ * - Modify config.json (safe_mode, etc.)
+ * - Start/stop any systemd services
  */
 
 #ifndef TAMPER_LOG_H
@@ -52,8 +56,8 @@ typedef enum {
 // --- Main API Functions ---
 
 /**
- * Log a tamper event to the database with blockchain support. 
- * Also updates safe_mode to true and stops measure_weight.service. 
+ * Log a tamper event to the database with blockchain support.
+ * Reads config from DEFAULT_CONFIG_FILE, logs to "mydata.db".
  *
  * @param tamper_type  Type of tamper (e.g., "magnetic", "firmware", "weight_drift")
  * @param details      Optional details/description (can be NULL)
@@ -66,7 +70,7 @@ TamperLogResult log_tamper(const char *tamper_type, const char *details);
  *
  * @param tamper_type   Type of tamper
  * @param details       Optional details (can be NULL)
- * @param config_path   Path to config.json
+ * @param config_path   Path to config.json (read-only)
  * @param db_path       Path to SQLite database
  * @return              TAMPER_LOG_SUCCESS on success, error code otherwise
  */
@@ -74,36 +78,13 @@ TamperLogResult log_tamper_ex(const char *tamper_type, const char *details,
                               const char *config_path, const char *db_path);
 
 /**
- * Parse configuration from config.json
+ * Parse configuration from config.json (read-only)
  *
  * @param filepath  Path to config.json
  * @param config    Pointer to TamperConfig structure to fill
  * @return          0 on success, -1 on failure
  */
 int parse_config(const char *filepath, TamperConfig *config);
-
-/**
- * Update safe_mode value in config.json
- *
- * @param filepath   Path to config.json
- * @param safe_mode  New value for safe_mode
- * @return           0 on success, -1 on failure
- */
-int update_safe_mode(const char *filepath, bool safe_mode);
-
-/**
- * Stop the measure_weight.service
- *
- * @return  0 on success, -1 on failure
- */
-int stop_weight_service(void);
-
-/**
- * Start the measure_weight.service
- *
- * @return  0 on success, -1 on failure
- */
-int start_weight_service(void);
 
 /**
  * Get human-readable error message for result code

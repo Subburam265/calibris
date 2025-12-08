@@ -1,9 +1,9 @@
 /**
  * Tamper Log Library for Calibris
  *
- * Implementation of blockchain-enabled tamper logging. 
+ * Implementation of blockchain-enabled tamper logging.
  *
- * Compile: gcc -c tamper_log.c -o tamper_log.o -lsqlite3 -lssl -lcrypto
+ * Compile: gcc -c tamper_log.c -o tamper_log.o
  * Create static lib: ar rcs libtamper_log.a tamper_log.o
  * Create shared lib: gcc -shared -fPIC tamper_log.c -o libtamper_log.so -lsqlite3 -lssl -lcrypto
  */
@@ -15,6 +15,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <stdbool.h>
 #include <sqlite3.h>
 #include <openssl/evp.h>
 
@@ -42,7 +43,7 @@ static void compute_sha256(const char *input, char *output_hex) {
     EVP_MD_CTX_free(ctx);
 
     for (unsigned int i = 0; i < hash_len; i++) {
-        sprintf(output_hex + (i * 2), "%02x", hash[i]);
+        snprintf(output_hex + (i * 2), 3, "%02x", hash[i]);
     }
     output_hex[hash_len * 2] = '\0';
 }
@@ -67,9 +68,11 @@ static int get_last_hash(sqlite3 *db, char *prev_hash, size_t hash_size) {
             prev_hash[hash_size - 1] = '\0';
         } else {
             strncpy(prev_hash, GENESIS_HASH, hash_size);
+            prev_hash[hash_size - 1] = '\0';
         }
     } else {
         strncpy(prev_hash, GENESIS_HASH, hash_size);
+        prev_hash[hash_size - 1] = '\0';
     }
 
     sqlite3_finalize(stmt);
@@ -193,85 +196,6 @@ int parse_config(const char *filepath, TamperConfig *config) {
     return 0;
 }
 
-// --- Update safe_mode in config.json ---
-int update_safe_mode(const char *filepath, bool safe_mode) {
-    FILE *fp = fopen(filepath, "r");
-    if (!fp) {
-        perror("[tamper_log] Failed to open config for reading");
-        return -1;
-    }
-
-    fseek(fp, 0, SEEK_END);
-    long fsize = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-
-    char *content = malloc(fsize + 1);
-    if (!content) {
-        fclose(fp);
-        return -1;
-    }
-
-    if (fread(content, 1, fsize, fp) != (size_t)fsize) {
-        free(content);
-        fclose(fp);
-        return -1;
-    }
-    content[fsize] = '\0';
-    fclose(fp);
-
-    char *pos = strstr(content, "\"safe_mode\"");
-    if (pos) {
-        char *colon = strchr(pos, ':');
-        if (colon) {
-            char *value_start = colon + 1;
-            while (isspace(*value_start)) value_start++;
-
-            char *new_content = malloc(fsize + 50);
-            if (!new_content) {
-                free(content);
-                return -1;
-            }
-
-            size_t prefix_len = value_start - content;
-            strncpy(new_content, content, prefix_len);
-            new_content[prefix_len] = '\0';
-
-            strcat(new_content, safe_mode ? "true" : "false");
-
-            char *value_end = value_start;
-            while (*value_end && *value_end != ',' && *value_end != '\n' && *value_end != '}') {
-                value_end++;
-            }
-            strcat(new_content, value_end);
-
-            fp = fopen(filepath, "w");
-            if (fp) {
-                fprintf(fp, "%s", new_content);
-                fclose(fp);
-            }
-
-            free(new_content);
-        }
-    }
-
-    free(content);
-    return 0;
-}
-
-// --- Stop weight service ---
-int stop_weight_service(void) {
-    printf("[tamper_log] Stopping measure_weight.service...\n");
-    int ret = system("systemctl stop measure_weight.service");
-    return (ret == 0) ? 0 : -1;
-}
-
-// --- Start weight service ---
-int start_weight_service(void) {
-    printf("[tamper_log] Starting measure_weight.service...\n");
-    int ret = system("systemctl start measure_weight.service");
-    return (ret == 0) ? 0 : -1;
-}
-
 // --- Get error message ---
 const char* tamper_log_strerror(TamperLogResult result) {
     switch (result) {
@@ -320,7 +244,7 @@ TamperLogResult log_tamper_ex(const char *tamper_type, const char *details,
     char prev_hash[65];
     get_last_hash(db, prev_hash, sizeof(prev_hash));
 
-    // Build data string for hashing (includes settling_time and renewal_cycle)
+    // Build data string for hashing
     char hash_data[2048];
     build_hash_data(hash_data, sizeof(hash_data), prev_hash,
                     config.device_id, config.device_type, tamper_type, "detected",
@@ -332,7 +256,7 @@ TamperLogResult log_tamper_ex(const char *tamper_type, const char *details,
     char curr_hash[65];
     compute_sha256(hash_data, curr_hash);
 
-    // Prepare SQL statement (14 parameters)
+    // Prepare SQL statement
     const char *insert_sql =
         "INSERT INTO tamper_logs (device_id, device_type, tamper_type, resolution_status, "
         "settling_time, renewal_cycle, latitude, longitude, city, state, drift, details, "
@@ -378,42 +302,23 @@ TamperLogResult log_tamper_ex(const char *tamper_type, const char *details,
     long long log_id = sqlite3_last_insert_rowid(db);
 
     // Print success info
-    printf("[tamper_log] Tamper logged successfully!\n");
+    printf("[tamper_log] Tamper logged successfully to %s!\n", db_path);
     printf("      log_id            : %lld\n", log_id);
     printf("      device_id         : %d\n", config.device_id);
     printf("      device_type       : %s\n", config.device_type);
     printf("      tamper_type       : %s\n", tamper_type);
-    printf("      resolution_status : detected\n");
-    printf("      settling_time     : %.4f\n", config.settling_time);
-    printf("      renewal_cycle     : %d\n", config.renewal_cycle);
-    printf("      latitude          : %.4f\n", config.latitude);
-    printf("      longitude         : %.4f\n", config.longitude);
-    printf("      city              : %s\n", config.city);
-    printf("      state             : %s\n", config.state);
     printf("      drift             : %.2f\n", config.zero_drift);
-    if (details) {
-        printf("      details           : %s\n", details);
-    }
     printf("      prev_hash         : %.16s...\n", prev_hash);
     printf("      curr_hash         : %.16s...\n", curr_hash);
 
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 
-    // Update safe_mode to true
-    if (update_safe_mode(config_path, true) != 0) {
-        fprintf(stderr, "[tamper_log] Warning: Failed to update safe_mode\n");
-    } else {
-        printf("[tamper_log] Config updated: safe_mode = true\n");
-    }
-
-    // Stop weight service
-    stop_weight_service();
-
     return TAMPER_LOG_SUCCESS;
 }
 
-// --- Main logging function (simple version with defaults) ---
+// --- Main logging function (simple version targeting mydata.db) ---
 TamperLogResult log_tamper(const char *tamper_type, const char *details) {
-    return log_tamper_ex(tamper_type, details, DEFAULT_CONFIG_FILE, DEFAULT_DB_PATH);
+    // Explicitly using "mydata.db" as requested
+    return log_tamper_ex(tamper_type, details, DEFAULT_CONFIG_FILE, "mydata.db");
 }
