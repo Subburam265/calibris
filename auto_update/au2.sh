@@ -107,7 +107,7 @@ echo "[INFO] Timestamp for this batch: $TIMESTAMP"
 
 # Step 4: Export records to a temporary CSV.
 echo "[INFO] Exporting data to temporary CSV..."
-SQL_QUERY="SELECT log_id, device_id, created_at, device_type, tamper_type, resolution_status, settling_time, renewal_cycle, latitude, longitude, city, state, drift, details, '$TIMESTAMP' AS $NULL_COLUMN FROM $TABLE_NAME WHERE $PRIMARY_KEY_COLUMN IN ($ID_LIST);"
+SQL_QUERY="SELECT log_id, device_id, created_at, device_type, tamper_type, resolution_status, settling_time, renewal_cycle, latitude, longitude, city, state, drift, details, prev_hash, curr_hash,'$TIMESTAMP' AS $NULL_COLUMN FROM $TABLE_NAME WHERE $PRIMARY_KEY_COLUMN IN ($ID_LIST);"
 
 sqlite3 -header -csv "$DB_FILE" "$SQL_QUERY" > "$TEMP_CSV"
 echo "[OK] Exported to $TEMP_CSV"
