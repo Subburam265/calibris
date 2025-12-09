@@ -19,7 +19,7 @@
 
 // --- File Paths ---
 #define CONFIG_FILE      "/home/pico/calibris/data/config.json"
-#define TAMPER_LOG_BIN   "/home/pico/calibris/bin/tamper_log"
+#define TAMPER_LOG_BIN   "/home/pico/calibris/bin/tamper_log_bin/tamper_log"
 
 // --- GPIO Configuration ---
 const char *chipname = "gpiochip1";

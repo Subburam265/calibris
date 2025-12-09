@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
-#include "../lib/tamper_logs.h"
+#include "../../lib/tamper_logs.h"
 
 #define VERSION "1.0.0"
 

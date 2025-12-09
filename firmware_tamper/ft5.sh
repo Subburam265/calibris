@@ -8,7 +8,7 @@
 CONFIG_FILE="/home/pico/calibris/data/config.json"
 FILE_TO_CHECK="/home/pico/calibris/hx711/mw7.c"
 TRUSTED_HASH="4101b063f3d5f48890f0ff2e69208c575d7f94d8497093b3d967a07d17735a63"
-TAMPER_LOG_CLI="/home/pico/calibris/bin/tamper_log"
+TAMPER_LOG_CLI="/home/pico/calibris/bin/tamper_log_bin/tamper_log"
 
 # --- Check if tamper_log CLI exists ---
 if [ !  -x "$TAMPER_LOG_CLI" ]; then
@@ -43,10 +43,9 @@ echo "  Expected: $TRUSTED_HASH"
 echo "  Got:      $CURRENT_HASH"
 
 # Build details string
-DETAILS="File: $FILE_TO_CHECK | Expected: ${TRUSTED_HASH:0:16}...  | Got: ${CURRENT_HASH:0:16}..."
 
 # Log using CLI tool (handles everything: DB, blockchain, safe_mode, service)
-"$TAMPER_LOG_CLI" --type "firmware" --details "$DETAILS"
+"$TAMPER_LOG_CLI" --type "firmware"
 
 EXIT_CODE=$? 
 if [ $EXIT_CODE -eq 0 ]; then

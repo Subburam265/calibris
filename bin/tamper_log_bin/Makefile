@@ -9,7 +9,7 @@ SRC = tamper_logs_cli.c
 TARGET = tamper_log
 
 # Library location
-LIB_DIR = ../lib
+LIB_DIR = ../../lib
 LIB = $(LIB_DIR)/libtamper_log.a
 
 # Libraries to link
