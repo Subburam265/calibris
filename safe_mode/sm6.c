@@ -322,7 +322,7 @@ int is_tare_button_pressed() {
     }
     // FIX: Assuming Active LOW (Pin -> Switch -> GND), pressed = 0.
     // Invert the result to return true when pressed.
-    return (data.values[0] == 0);
+    return (data.values[0] == 1);
 }
 
 // --- Terminal Functions ---

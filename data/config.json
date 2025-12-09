@@ -2,7 +2,7 @@
 	"device_id":	1,
 	"type":	"Weighing machine",
 	"calibration_factor":	214.37249755859375,
-	"tare_offset":	58767,
+	"tare_offset":	0,
 	"zero_drift":	0,
 	"max_zero_drift_threshold":	5000,
 	"settling_time":	0.5,

@@ -1,0 +1,1016 @@
+[2025-12-10 03:47:39] \033[1;33mStarting tamper log sync...\033[0m
+[2025-12-10 03:47:40] Last synced ID: 0
+[2025-12-10 03:47:40] \033[0;32mTamper log sync completed!\033[0m
+[2025-12-10 03:51:35] \033[1;33mStarting tamper log sync...\033[0m
+[2025-12-10 03:51:35] Last synced ID: 0
+[2025-12-10 03:51:35] \033[0;32mTamper log sync completed!\033[0m
+[2025-12-10 03:56:12] \033[1;33mStarting tamper log sync...\033[0m
+[2025-12-10 03:56:12] Last synced ID: 0
+[2025-12-10 03:56:12] \033[1;33mProcessing tamper log ID: 1\033[0m
+[2025-12-10 03:56:12] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "",
+  "event_time": "2025-12-06 09:29:05",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "curr_hash": "8ca4ede8cf32e8fe51c17560c5b070b7cf7611f3b3da0211eb495475f6071901",
+  "luckfox_log_id": "1"
+}
+[2025-12-10 03:56:16] \033[0;31m✗ Failed to sync log ID: 1 (HTTP 400)\033[0m
+[2025-12-10 03:56:16] Response: {"error":"invalid input syntax for type integer: \"0.5\""}
+[2025-12-10 03:56:16] \033[0;32mTamper log sync completed!\033[0m
+[2025-12-10 03:59:02] \033[1;33mStarting tamper log sync...\033[0m
+[2025-12-10 03:59:02] Last synced ID: 0
+[2025-12-10 03:59:02] \033[1;33mProcessing tamper log ID: 1\033[0m
+[2025-12-10 03:59:02] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "",
+  "event_time": "2025-12-06 09:29:05",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "curr_hash": "8ca4ede8cf32e8fe51c17560c5b070b7cf7611f3b3da0211eb495475f6071901",
+  "luckfox_log_id": "1"
+}
+[2025-12-10 03:59:06] \033[0;32m✓ Successfully synced log ID: 1\033[0m
+[2025-12-10 03:59:06] \033[1;33mProcessing tamper log ID: 2\033[0m
+[2025-12-10 03:59:06] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "",
+  "event_time": "2025-12-06 09:29:09",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "8ca4ede8cf32e8fe51c17560c5b070b7cf7611f3b3da0211eb495475f6071901",
+  "curr_hash": "c403044c71ffcd73e392681d15ffa8b20316027e957886cc448de5c801a069ea",
+  "luckfox_log_id": "2"
+}
+[2025-12-10 03:59:08] \033[0;32m✓ Successfully synced log ID: 2\033[0m
+[2025-12-10 03:59:08] \033[1;33mProcessing tamper log ID: 3\033[0m
+[2025-12-10 03:59:08] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "",
+  "event_time": "2025-12-06 09:29:19",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "c403044c71ffcd73e392681d15ffa8b20316027e957886cc448de5c801a069ea",
+  "curr_hash": "fc4cc5aaac5f9681880e586134ff6e38a626021521138d81326d333241b30070",
+  "luckfox_log_id": "3"
+}
+[2025-12-10 03:59:10] \033[0;32m✓ Successfully synced log ID: 3\033[0m
+[2025-12-10 03:59:10] \033[1;33mProcessing tamper log ID: 4\033[0m
+[2025-12-10 03:59:10] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "",
+  "event_time": "2025-12-06 09:29:28",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "fc4cc5aaac5f9681880e586134ff6e38a626021521138d81326d333241b30070",
+  "curr_hash": "b2a198e244616b9f1bae82a6cc3a35befee8372ebbf69df643eae66b616e7dd6",
+  "luckfox_log_id": "4"
+}
+[2025-12-10 03:59:12] \033[0;32m✓ Successfully synced log ID: 4\033[0m
+[2025-12-10 03:59:12] \033[1;33mProcessing tamper log ID: 5\033[0m
+[2025-12-10 03:59:12] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "",
+  "event_time": "2025-12-08 09:30:04",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "b2a198e244616b9f1bae82a6cc3a35befee8372ebbf69df643eae66b616e7dd6",
+  "curr_hash": "0f3b6035e2f88f0a4bfe4f93029b41ca23e264b65bc278640008b0b8b8526687",
+  "luckfox_log_id": "5"
+}
+[2025-12-10 03:59:14] \033[0;32m✓ Successfully synced log ID: 5\033[0m
+[2025-12-10 03:59:14] \033[1;33mProcessing tamper log ID: 6\033[0m
+[2025-12-10 03:59:14] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "",
+  "event_time": "2025-12-08 09:41:35",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "0f3b6035e2f88f0a4bfe4f93029b41ca23e264b65bc278640008b0b8b8526687",
+  "curr_hash": "9675b1a5c826defb763a0988a17329b2281c0f388a547c6e000680c1f40209af",
+  "luckfox_log_id": "6"
+}
+[2025-12-10 03:59:16] \033[0;32m✓ Successfully synced log ID: 6\033[0m
+[2025-12-10 03:59:17] \033[1;33mProcessing tamper log ID: 7\033[0m
+[2025-12-10 03:59:17] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "",
+  "event_time": "2025-12-08 10:58:07",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "9675b1a5c826defb763a0988a17329b2281c0f388a547c6e000680c1f40209af",
+  "curr_hash": "159be88b81753bd601af1aa9a31d7746763e464512be95542b640649b409764b",
+  "luckfox_log_id": "7"
+}
+[2025-12-10 03:59:18] \033[0;32m✓ Successfully synced log ID: 7\033[0m
+[2025-12-10 03:59:19] \033[1;33mProcessing tamper log ID: 10\033[0m
+[2025-12-10 03:59:19] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:20:58",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "159be88b81753bd601af1aa9a31d7746763e464512be95542b640649b409764b",
+  "curr_hash": "93de83d7806e4161c32e73baaba956aaed0599ab2e7c8946dd164b164174ed26",
+  "luckfox_log_id": "10"
+}
+[2025-12-10 03:59:20] \033[0;32m✓ Successfully synced log ID: 10\033[0m
+[2025-12-10 03:59:21] \033[1;33mProcessing tamper log ID: 11\033[0m
+[2025-12-10 03:59:21] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:21:00",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "93de83d7806e4161c32e73baaba956aaed0599ab2e7c8946dd164b164174ed26",
+  "curr_hash": "e47fc5f201507ab54652b1fe655d8f6e0216210caff30d4519c81150e7e44d11",
+  "luckfox_log_id": "11"
+}
+[2025-12-10 03:59:22] \033[0;32m✓ Successfully synced log ID: 11\033[0m
+[2025-12-10 03:59:23] \033[1;33mProcessing tamper log ID: 12\033[0m
+[2025-12-10 03:59:23] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:21:03",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "e47fc5f201507ab54652b1fe655d8f6e0216210caff30d4519c81150e7e44d11",
+  "curr_hash": "d8f6e075153e96de674e662e623e2fc542e84864cef71de34297687d9c9eedab",
+  "luckfox_log_id": "12"
+}
+[2025-12-10 03:59:25] \033[0;32m✓ Successfully synced log ID: 12\033[0m
+[2025-12-10 03:59:25] \033[1;33mProcessing tamper log ID: 13\033[0m
+[2025-12-10 03:59:25] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:38:45",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "d8f6e075153e96de674e662e623e2fc542e84864cef71de34297687d9c9eedab",
+  "curr_hash": "ae82f7b065f887846f03cdf92b0afa7157561e7061cf72a276fdde61b77690b9",
+  "luckfox_log_id": "13"
+}
+[2025-12-10 03:59:27] \033[0;32m✓ Successfully synced log ID: 13\033[0m
+[2025-12-10 03:59:27] \033[1;33mProcessing tamper log ID: 14\033[0m
+[2025-12-10 03:59:27] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:38:46",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "ae82f7b065f887846f03cdf92b0afa7157561e7061cf72a276fdde61b77690b9",
+  "curr_hash": "4ca4c36f880e7263e620cc36783816a9c40eea8dbd4a8440455de33fef79267f",
+  "luckfox_log_id": "14"
+}
+[2025-12-10 03:59:29] \033[0;32m✓ Successfully synced log ID: 14\033[0m
+[2025-12-10 03:59:29] \033[1;33mProcessing tamper log ID: 15\033[0m
+[2025-12-10 03:59:30] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:38:50",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "4ca4c36f880e7263e620cc36783816a9c40eea8dbd4a8440455de33fef79267f",
+  "curr_hash": "30401ac099d66696f539cc2265f669aad33297ce9c0202b380ac223836635a41",
+  "luckfox_log_id": "15"
+}
+[2025-12-10 03:59:31] \033[0;32m✓ Successfully synced log ID: 15\033[0m
+[2025-12-10 03:59:32] \033[1;33mProcessing tamper log ID: 16\033[0m
+[2025-12-10 03:59:32] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:40:03",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "30401ac099d66696f539cc2265f669aad33297ce9c0202b380ac223836635a41",
+  "curr_hash": "0327483f1c5ace989833b82c56863300d52a0a02e4915e2d39760455a9c51f92",
+  "luckfox_log_id": "16"
+}
+[2025-12-10 03:59:33] \033[0;32m✓ Successfully synced log ID: 16\033[0m
+[2025-12-10 03:59:34] \033[1;33mProcessing tamper log ID: 17\033[0m
+[2025-12-10 03:59:34] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:40:03",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "0327483f1c5ace989833b82c56863300d52a0a02e4915e2d39760455a9c51f92",
+  "curr_hash": "26ed7937ebf5df76a1fa980923505dc55c7dc90ebe146d24909880e41b833aec",
+  "luckfox_log_id": "17"
+}
+[2025-12-10 03:59:35] \033[0;32m✓ Successfully synced log ID: 17\033[0m
+[2025-12-10 03:59:36] \033[1;33mProcessing tamper log ID: 18\033[0m
+[2025-12-10 03:59:36] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:40:04",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "26ed7937ebf5df76a1fa980923505dc55c7dc90ebe146d24909880e41b833aec",
+  "curr_hash": "a0ec0a7911d94b05c2259aabea80290e2b28f6035b6d1c0e239f6b78d7bdf309",
+  "luckfox_log_id": "18"
+}
+[2025-12-10 03:59:37] \033[0;32m✓ Successfully synced log ID: 18\033[0m
+[2025-12-10 03:59:38] \033[1;33mProcessing tamper log ID: 19\033[0m
+[2025-12-10 03:59:38] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:41:56",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "a0ec0a7911d94b05c2259aabea80290e2b28f6035b6d1c0e239f6b78d7bdf309",
+  "curr_hash": "104490313def9ab92fe7710fb4cdd6b65b3ddd440810827af8b5ec97c5316c9e",
+  "luckfox_log_id": "19"
+}
+[2025-12-10 03:59:39] \033[0;32m✓ Successfully synced log ID: 19\033[0m
+[2025-12-10 03:59:40] \033[1;33mProcessing tamper log ID: 20\033[0m
+[2025-12-10 03:59:40] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:42:16",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "104490313def9ab92fe7710fb4cdd6b65b3ddd440810827af8b5ec97c5316c9e",
+  "curr_hash": "8f26124271b29008a6b50b50ef7aba618f3b2530bcca05db551dbb922bcd4278",
+  "luckfox_log_id": "20"
+}
+[2025-12-10 03:59:41] \033[0;32m✓ Successfully synced log ID: 20\033[0m
+[2025-12-10 03:59:42] \033[1;33mProcessing tamper log ID: 21\033[0m
+[2025-12-10 03:59:42] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:42:18",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "8f26124271b29008a6b50b50ef7aba618f3b2530bcca05db551dbb922bcd4278",
+  "curr_hash": "5d16df09b48a631b1487808bf3108d27380b22dd4e968af249dac1b832972212",
+  "luckfox_log_id": "21"
+}
+[2025-12-10 03:59:44] \033[0;32m✓ Successfully synced log ID: 21\033[0m
+[2025-12-10 03:59:44] \033[1;33mProcessing tamper log ID: 22\033[0m
+[2025-12-10 03:59:44] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:43:08",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "5d16df09b48a631b1487808bf3108d27380b22dd4e968af249dac1b832972212",
+  "curr_hash": "dc8d1d962d0d703c8f65c417285896cb5edb55a8353e50e4293abef55a3a0fb2",
+  "luckfox_log_id": "22"
+}
+[2025-12-10 03:59:46] \033[0;32m✓ Successfully synced log ID: 22\033[0m
+[2025-12-10 03:59:47] \033[1;33mProcessing tamper log ID: 23\033[0m
+[2025-12-10 03:59:47] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:43:12",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "dc8d1d962d0d703c8f65c417285896cb5edb55a8353e50e4293abef55a3a0fb2",
+  "curr_hash": "f52a878d0be057fe265988ab16810cd5587be00c458afefa1eddc5d2438ae72f",
+  "luckfox_log_id": "23"
+}
+[2025-12-10 03:59:48] \033[0;32m✓ Successfully synced log ID: 23\033[0m
+[2025-12-10 03:59:49] \033[1;33mProcessing tamper log ID: 24\033[0m
+[2025-12-10 03:59:49] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:43:15",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "f52a878d0be057fe265988ab16810cd5587be00c458afefa1eddc5d2438ae72f",
+  "curr_hash": "fc6e19d752171bb22ee86dfa3a354fd2679bef6f54bb20853f890fa9722883c3",
+  "luckfox_log_id": "24"
+}
+[2025-12-10 03:59:50] \033[0;32m✓ Successfully synced log ID: 24\033[0m
+[2025-12-10 03:59:51] \033[1;33mProcessing tamper log ID: 25\033[0m
+[2025-12-10 03:59:51] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:49:09",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "fc6e19d752171bb22ee86dfa3a354fd2679bef6f54bb20853f890fa9722883c3",
+  "curr_hash": "4f9c3fd08d9bd69a0331e5bbf6531cf86cb8ba60115d16ddedeaacc0c245b1dc",
+  "luckfox_log_id": "25"
+}
+[2025-12-10 03:59:52] \033[0;32m✓ Successfully synced log ID: 25\033[0m
+[2025-12-10 03:59:53] \033[1;33mProcessing tamper log ID: 26\033[0m
+[2025-12-10 03:59:53] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:49:10",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "4f9c3fd08d9bd69a0331e5bbf6531cf86cb8ba60115d16ddedeaacc0c245b1dc",
+  "curr_hash": "eb1f7077b81e145505034ff20919decc31a90632330b20c7e9f09b562a6ff2df",
+  "luckfox_log_id": "26"
+}
+[2025-12-10 03:59:55] \033[0;32m✓ Successfully synced log ID: 26\033[0m
+[2025-12-10 03:59:55] \033[1;33mProcessing tamper log ID: 27\033[0m
+[2025-12-10 03:59:55] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:50:59",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "eb1f7077b81e145505034ff20919decc31a90632330b20c7e9f09b562a6ff2df",
+  "curr_hash": "2a102c1052cf3ac3b77865e27c272360aaa8150db48551a74819aef58e2b5789",
+  "luckfox_log_id": "27"
+}
+[2025-12-10 03:59:57] \033[0;32m✓ Successfully synced log ID: 27\033[0m
+[2025-12-10 03:59:57] \033[1;33mProcessing tamper log ID: 28\033[0m
+[2025-12-10 03:59:57] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 12:55:03",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "2a102c1052cf3ac3b77865e27c272360aaa8150db48551a74819aef58e2b5789",
+  "curr_hash": "4df4c978b39d5f8abce38fa54c162f8d51bf129f0054c2f2c1c1f42d1c177f61",
+  "luckfox_log_id": "28"
+}
+[2025-12-10 03:59:59] \033[0;32m✓ Successfully synced log ID: 28\033[0m
+[2025-12-10 03:59:59] \033[1;33mProcessing tamper log ID: 29\033[0m
+[2025-12-10 03:59:59] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:09:33",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "4df4c978b39d5f8abce38fa54c162f8d51bf129f0054c2f2c1c1f42d1c177f61",
+  "curr_hash": "729c8d62ef25b808dc67cd7b4da1df679b7c1e395ea073220d94178aeed931f4",
+  "luckfox_log_id": "29"
+}
+[2025-12-10 04:00:01] \033[0;32m✓ Successfully synced log ID: 29\033[0m
+[2025-12-10 04:00:01] \033[1;33mProcessing tamper log ID: 30\033[0m
+[2025-12-10 04:00:01] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:10:34",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "729c8d62ef25b808dc67cd7b4da1df679b7c1e395ea073220d94178aeed931f4",
+  "curr_hash": "e6ca96b259c7d0726937d13d928bc6f1484914605381c7a2abf9ddb09c771bf9",
+  "luckfox_log_id": "30"
+}
+[2025-12-10 04:00:03] \033[0;32m✓ Successfully synced log ID: 30\033[0m
+[2025-12-10 04:00:03] \033[1;33mProcessing tamper log ID: 31\033[0m
+[2025-12-10 04:00:03] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:10:36",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "e6ca96b259c7d0726937d13d928bc6f1484914605381c7a2abf9ddb09c771bf9",
+  "curr_hash": "b840678eb1ca2e99efad1c041cd72bae327b1833022b09df5fd7185496a3c1ce",
+  "luckfox_log_id": "31"
+}
+[2025-12-10 04:00:05] \033[0;32m✓ Successfully synced log ID: 31\033[0m
+[2025-12-10 04:00:05] \033[1;33mProcessing tamper log ID: 32\033[0m
+[2025-12-10 04:00:06] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:10:41",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "b840678eb1ca2e99efad1c041cd72bae327b1833022b09df5fd7185496a3c1ce",
+  "curr_hash": "d22c8c54f06c2652a54775ecb7b4ddbbd7bca221ee4aca1a8e7f6eaaa0c6d606",
+  "luckfox_log_id": "32"
+}
+[2025-12-10 04:00:07] \033[0;32m✓ Successfully synced log ID: 32\033[0m
+[2025-12-10 04:00:08] \033[1;33mProcessing tamper log ID: 33\033[0m
+[2025-12-10 04:00:08] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:10:45",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "d22c8c54f06c2652a54775ecb7b4ddbbd7bca221ee4aca1a8e7f6eaaa0c6d606",
+  "curr_hash": "5a08051a25ceae3c572aa1e5ef37d0efd245885c31f74186e6bff4d132f69339",
+  "luckfox_log_id": "33"
+}
+[2025-12-10 04:00:09] \033[0;32m✓ Successfully synced log ID: 33\033[0m
+[2025-12-10 04:00:10] \033[1;33mProcessing tamper log ID: 34\033[0m
+[2025-12-10 04:00:10] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:12:54",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "5a08051a25ceae3c572aa1e5ef37d0efd245885c31f74186e6bff4d132f69339",
+  "curr_hash": "30b4f1ed28deb63f25a0d1b93ffcf3a5e5820a724fb7e85a6125ac23c9f3d3f8",
+  "luckfox_log_id": "34"
+}
+[2025-12-10 04:00:11] \033[0;32m✓ Successfully synced log ID: 34\033[0m
+[2025-12-10 04:00:12] \033[1;33mProcessing tamper log ID: 35\033[0m
+[2025-12-10 04:00:12] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:12:55",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "30b4f1ed28deb63f25a0d1b93ffcf3a5e5820a724fb7e85a6125ac23c9f3d3f8",
+  "curr_hash": "e007b89b0e3ba111b8c23f0da879e6bce241f5913bd9030a285ea3d72761c2b6",
+  "luckfox_log_id": "35"
+}
+[2025-12-10 04:00:13] \033[0;32m✓ Successfully synced log ID: 35\033[0m
+[2025-12-10 04:00:14] \033[1;33mProcessing tamper log ID: 36\033[0m
+[2025-12-10 04:00:14] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:12:57",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "e007b89b0e3ba111b8c23f0da879e6bce241f5913bd9030a285ea3d72761c2b6",
+  "curr_hash": "58a07153f091c8151135c1cd0bf3ac9d6fd8fe4287b36797f7038ccc7b189131",
+  "luckfox_log_id": "36"
+}
+[2025-12-10 04:00:15] \033[0;32m✓ Successfully synced log ID: 36\033[0m
+[2025-12-10 04:00:16] \033[1;33mProcessing tamper log ID: 37\033[0m
+[2025-12-10 04:00:16] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:12:58",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "58a07153f091c8151135c1cd0bf3ac9d6fd8fe4287b36797f7038ccc7b189131",
+  "curr_hash": "d157d52f486640e4e7543b368cbc701f240f18cbb3f412ce8c171bbc718a9521",
+  "luckfox_log_id": "37"
+}
+[2025-12-10 04:00:18] \033[0;32m✓ Successfully synced log ID: 37\033[0m
+[2025-12-10 04:00:18] \033[1;33mProcessing tamper log ID: 38\033[0m
+[2025-12-10 04:00:18] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:40:53",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "d157d52f486640e4e7543b368cbc701f240f18cbb3f412ce8c171bbc718a9521",
+  "curr_hash": "0f575f2d6ff253ccf44b7580cfb41071b3f3de4f9446a549af07e5dddd7cc3e7",
+  "luckfox_log_id": "38"
+}
+[2025-12-10 04:00:20] \033[0;32m✓ Successfully synced log ID: 38\033[0m
+[2025-12-10 04:00:20] \033[1;33mProcessing tamper log ID: 39\033[0m
+[2025-12-10 04:00:20] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:40:54",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "0f575f2d6ff253ccf44b7580cfb41071b3f3de4f9446a549af07e5dddd7cc3e7",
+  "curr_hash": "2b9c55dda66419395c511ebb8ed4542df112c85ccd8b4aef3b708f80ad537d38",
+  "luckfox_log_id": "39"
+}
+[2025-12-10 04:00:22] \033[0;32m✓ Successfully synced log ID: 39\033[0m
+[2025-12-10 04:00:22] \033[1;33mProcessing tamper log ID: 40\033[0m
+[2025-12-10 04:00:22] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:40:59",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "2b9c55dda66419395c511ebb8ed4542df112c85ccd8b4aef3b708f80ad537d38",
+  "curr_hash": "b1822d6b66141475e3f98a93c1e7997056010f5496ed2c634a3ef9da66df7601",
+  "luckfox_log_id": "40"
+}
+[2025-12-10 04:00:24] \033[0;32m✓ Successfully synced log ID: 40\033[0m
+[2025-12-10 04:00:24] \033[1;33mProcessing tamper log ID: 41\033[0m
+[2025-12-10 04:00:25] Sending JSON payload:
+{
+  "tamper_type": "magnetic",
+  "details": "Magnet removed from sensor",
+  "event_time": "2025-12-08 13:41:10",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "b1822d6b66141475e3f98a93c1e7997056010f5496ed2c634a3ef9da66df7601",
+  "curr_hash": "b0c8a546f94c78a6e1df9e6ea7da500568fcdcc8fdc6cb9cb57aa794e65ee723",
+  "luckfox_log_id": "41"
+}
+[2025-12-10 04:00:26] \033[0;32m✓ Successfully synced log ID: 41\033[0m
+[2025-12-10 04:00:27] \033[1;33mProcessing tamper log ID: 42\033[0m
+[2025-12-10 04:00:27] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "Hash mismatch detected",
+  "event_time": "2025-12-08 21:34:06",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "b0c8a546f94c78a6e1df9e6ea7da500568fcdcc8fdc6cb9cb57aa794e65ee723",
+  "curr_hash": "552ac56c245d27ad5d23b4212bfe27e7881aabe1a65d873905581ee680ce13c9",
+  "luckfox_log_id": "42"
+}
+[2025-12-10 04:00:28] \033[0;32m✓ Successfully synced log ID: 42\033[0m
+[2025-12-10 04:00:29] \033[1;33mProcessing tamper log ID: 43\033[0m
+[2025-12-10 04:00:29] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "Hash mismatch detected",
+  "event_time": "2025-12-08 21:36:20",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "552ac56c245d27ad5d23b4212bfe27e7881aabe1a65d873905581ee680ce13c9",
+  "curr_hash": "6e9e602d65b1a48e0d46d1e3ce2f2d2f33c774c22a23a3ce710edafdf8c45fd0",
+  "luckfox_log_id": "43"
+}
+[2025-12-10 04:00:30] \033[0;32m✓ Successfully synced log ID: 43\033[0m
+[2025-12-10 04:00:31] \033[1;33mProcessing tamper log ID: 44\033[0m
+[2025-12-10 04:00:31] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "",
+  "event_time": "2025-12-08 21:40:03",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "6e9e602d65b1a48e0d46d1e3ce2f2d2f33c774c22a23a3ce710edafdf8c45fd0",
+  "curr_hash": "843f5b050cc7d07efb6449e2cc8819c3a5ddafe3bc46128429da3d28082641f0",
+  "luckfox_log_id": "44"
+}
+[2025-12-10 04:00:32] \033[0;32m✓ Successfully synced log ID: 44\033[0m
+[2025-12-10 04:00:33] \033[1;33mProcessing tamper log ID: 45\033[0m
+[2025-12-10 04:00:33] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "File: /home/pico/calibris/hx711/mw7.c | Expected: 4101b063f3d5f488...  | Got: b95d8dda9216935e...",
+  "event_time": "2025-12-08 22:26:13",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "843f5b050cc7d07efb6449e2cc8819c3a5ddafe3bc46128429da3d28082641f0",
+  "curr_hash": "dd3e4d34c9c72fb60bb2881156b58617e9fc1ee946568d60319d3909f9d074ca",
+  "luckfox_log_id": "45"
+}
+[2025-12-10 04:00:35] \033[0;32m✓ Successfully synced log ID: 45\033[0m
+[2025-12-10 04:00:35] \033[1;33mProcessing tamper log ID: 46\033[0m
+[2025-12-10 04:00:35] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "File: /home/pico/calibris/hx711/mw7.c | Expected: 4101b063f3d5f488...  | Got: b95d8dda9216935e...",
+  "event_time": "2025-12-09 11:31:29",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "dd3e4d34c9c72fb60bb2881156b58617e9fc1ee946568d60319d3909f9d074ca",
+  "curr_hash": "27a71c2f81a8fd27d9e2e65a3de7a284fb31b8d12682014fccf8b8a5b3cd4798",
+  "luckfox_log_id": "46"
+}
+[2025-12-10 04:00:37] \033[0;32m✓ Successfully synced log ID: 46\033[0m
+[2025-12-10 04:00:37] \033[1;33mProcessing tamper log ID: 47\033[0m
+[2025-12-10 04:00:37] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "File: /home/pico/calibris/hx711/mw7.c | Expected: 4101b063f3d5f488...  | Got: b95d8dda9216935e...",
+  "event_time": "2025-12-09 11:32:26",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "27a71c2f81a8fd27d9e2e65a3de7a284fb31b8d12682014fccf8b8a5b3cd4798",
+  "curr_hash": "2fd12e2ca69b688761a772efc532a84267bb8e57c3e721284f14e66c4cd1d330",
+  "luckfox_log_id": "47"
+}
+[2025-12-10 04:00:39] \033[0;32m✓ Successfully synced log ID: 47\033[0m
+[2025-12-10 04:00:39] \033[1;33mProcessing tamper log ID: 48\033[0m
+[2025-12-10 04:00:39] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "File: /home/pico/calibris/hx711/mw7.c | Expected: 4101b063f3d5f488...  | Got: b95d8dda9216935e...",
+  "event_time": "2025-12-09 12:01:23",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "2fd12e2ca69b688761a772efc532a84267bb8e57c3e721284f14e66c4cd1d330",
+  "curr_hash": "fd291fa9ae654766a2ae8c8158055322486353a60a9f3134742c4582c0ba6828",
+  "luckfox_log_id": "48"
+}
+[2025-12-10 04:00:41] \033[0;32m✓ Successfully synced log ID: 48\033[0m
+[2025-12-10 04:00:41] \033[1;33mProcessing tamper log ID: 49\033[0m
+[2025-12-10 04:00:41] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "File: /home/pico/calibris/hx711/mw7.c | Expected: 4101b063f3d5f488...  | Got: b95d8dda9216935e...",
+  "event_time": "2025-12-09 12:02:15",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "fd291fa9ae654766a2ae8c8158055322486353a60a9f3134742c4582c0ba6828",
+  "curr_hash": "570b7dd2e2fe3fa6186fc85d04f76cce45425e2ee08c306f1b6b84bb035a22f4",
+  "luckfox_log_id": "49"
+}
+[2025-12-10 04:00:43] \033[0;32m✓ Successfully synced log ID: 49\033[0m
+[2025-12-10 04:00:44] \033[1;33mProcessing tamper log ID: 50\033[0m
+[2025-12-10 04:00:44] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "File: /home/pico/calibris/hx711/mw7.c | Expected: 4101b063f3d5f488...  | Got: b95d8dda9216935e...",
+  "event_time": "2025-12-09 13:55:51",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "570b7dd2e2fe3fa6186fc85d04f76cce45425e2ee08c306f1b6b84bb035a22f4",
+  "curr_hash": "baea11cc81344aee205b854661bebdabcdb93bb41f52eb7214901cd677f31e07",
+  "luckfox_log_id": "50"
+}
+[2025-12-10 04:00:46] \033[0;32m✓ Successfully synced log ID: 50\033[0m
+[2025-12-10 04:00:47] \033[1;33mProcessing tamper log ID: 51\033[0m
+[2025-12-10 04:00:47] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "File: /home/pico/calibris/hx711/mw7.c | Expected: 4101b063f3d5f488...  | Got: b95d8dda9216935e...",
+  "event_time": "2025-12-09 13:56:46",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "baea11cc81344aee205b854661bebdabcdb93bb41f52eb7214901cd677f31e07",
+  "curr_hash": "9a9d621529fc64bb60128dd4d3636939de86a9b5440d60729664fd527b61af8b",
+  "luckfox_log_id": "51"
+}
+[2025-12-10 04:00:48] \033[0;32m✓ Successfully synced log ID: 51\033[0m
+[2025-12-10 04:00:49] \033[1;33mProcessing tamper log ID: 52\033[0m
+[2025-12-10 04:00:49] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "File: /home/pico/calibris/hx711/mw7.c | Expected: 4101b063f3d5f488...  | Got: b95d8dda9216935e...",
+  "event_time": "2025-12-09 13:56:53",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "9a9d621529fc64bb60128dd4d3636939de86a9b5440d60729664fd527b61af8b",
+  "curr_hash": "22f0a113a1b3df50b33b9869ee1040c941ff783718ea71037d6f2f58aa9fbcac",
+  "luckfox_log_id": "52"
+}
+[2025-12-10 04:00:51] \033[0;32m✓ Successfully synced log ID: 52\033[0m
+[2025-12-10 04:00:51] \033[0;32mTamper log sync completed!\033[0m
+[2025-12-10 04:02:08] \033[1;33mStarting tamper log sync...\033[0m
+[2025-12-10 04:02:08] Last synced ID: 52
+[2025-12-10 04:02:08] \033[0;32mTamper log sync completed!\033[0m
+[2025-12-10 04:22:02] \033[1;33mStarting tamper log sync...\033[0m
+[2025-12-10 04:22:02] \033[0;31mNo internet connection\033[0m
+[2025-12-10 04:22:03] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-10 04:22:23] \033[1;33mStarting tamper log sync...\033[0m
+[2025-12-10 04:22:23] Last synced ID: 52
+[2025-12-10 04:22:23] \033[1;33mProcessing tamper log ID: 53\033[0m
+[2025-12-10 04:22:23] Sending JSON payload:
+{
+  "tamper_type": "firmware",
+  "details": "File: /home/pico/calibris/hx711/mw7.c | Expected: 4101b063f3d5f488...  | Got: b95d8dda9216935e...",
+  "event_time": "2025-12-09 20:21:43",
+  "resolution_status": "detected",
+  "settling_time": 0.5,
+  "renewal_cycle": 67,
+  "latitude": 13.0827,
+  "longitude": 80.2707,
+  "city": "Chennai",
+  "state": "Tamil Nadu",
+  "drift": 0.0,
+  "prev_hash": "22f0a113a1b3df50b33b9869ee1040c941ff783718ea71037d6f2f58aa9fbcac",
+  "curr_hash": "b33f73648c1fdaf9d717cc0dc3a1b7186ba9f5d94757e14217cb23229a1484e7",
+  "luckfox_log_id": "53"
+}
+[2025-12-10 04:22:29] \033[0;32m✓ Successfully synced log ID: 53\033[0m
+[2025-12-10 04:22:30] \033[0;32mTamper log sync completed!\033[0m
+[2025-12-10 04:22:58] \033[1;33mStarting tamper log sync...\033[0m
+[2025-12-10 04:22:58] Last synced ID: 53
+[2025-12-10 04:22:58] \033[0;32mTamper log sync completed!\033[0m
+[2025-12-10 04:23:04] \033[1;33mStarting tamper log sync...\033[0m
+[2025-12-10 04:23:04] Last synced ID: 53
+[2025-12-10 04:23:04] \033[0;32mTamper log sync completed!\033[0m
