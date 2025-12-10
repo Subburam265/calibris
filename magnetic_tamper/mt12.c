@@ -20,6 +20,7 @@
 // --- File Paths ---
 #define CONFIG_FILE      "/home/pico/calibris/data/config.json"
 #define TAMPER_LOG_BIN   "/home/pico/calibris/bin/tamper_log_bin/tamper_log"
+#define SAFE_MODE_BIN    "/home/pico/calibris/bin/activate_safe_mode_bin/activate_safe_mode"
 
 // --- GPIO Configuration ---
 const char *chipname = "gpiochip1";
@@ -57,11 +58,11 @@ void signal_handler(int signum) {
     running = 0;
 }
 
-// --- Helper: Extract string value from JSON line ---
+// --- Helper:  Extract string value from JSON line ---
 void extract_json_string(const char *line, const char *key, char *dest, size_t dest_size) {
     char *pos = strstr(line, key);
     if (pos) {
-        char *start = strchr(pos, ':');
+        char *start = strchr(pos, ': ');
         if (start) {
             // Find opening quote
             start = strchr(start, '"');
@@ -79,7 +80,7 @@ void extract_json_string(const char *line, const char *key, char *dest, size_t d
     }
 }
 
-// --- Parse config.json ---
+// --- Parse config. json ---
 int parse_config(const char *filepath, Config *config) {
     FILE *fp = fopen(filepath, "r");
     if (!fp) {
@@ -104,7 +105,7 @@ int parse_config(const char *filepath, Config *config) {
     char line_buf[1024];
     while (fgets(line_buf, sizeof(line_buf), fp)) {
         if (strstr(line_buf, "\"device_id\"")) {
-            char *p = strchr(line_buf, ':');
+            char *p = strchr(line_buf, ': ');
             if(p) sscanf(p + 1, "%d", &config->device_id);
         }
         extract_json_string(line_buf, "\"type\"", config->device_type, sizeof(config->device_type));
@@ -124,36 +125,120 @@ int parse_config(const char *filepath, Config *config) {
     return 0;
 }
 
-// --- Call /bin/tamper_log to log tamper event ---
+// --- Call tamper_log binary with detailed error handling ---
 int log_tamper_event(const char *tamper_type, const char *details) {
+    // First, verify the binary exists and is executable
+    if (access(TAMPER_LOG_BIN, F_OK) != 0) {
+        fprintf(stderr, "[ERROR] tamper_log binary not found at:  %s\n", TAMPER_LOG_BIN);
+        return -1;
+    }
+    
+    if (access(TAMPER_LOG_BIN, X_OK) != 0) {
+        fprintf(stderr, "[ERROR] tamper_log binary not executable: %s\n", TAMPER_LOG_BIN);
+        fprintf(stderr, "[ERROR] Attempting to fix permissions...\n");
+        // Try to fix permissions
+        char chmod_cmd[512];
+        snprintf(chmod_cmd, sizeof(chmod_cmd), "sudo chmod +x %s", TAMPER_LOG_BIN);
+        system(chmod_cmd);
+    }
+    
     pid_t pid = fork();
     if (pid < 0) {
-        perror("fork");
+        perror("[ERROR] fork failed");
         return -1;
     }
+    
     if (pid == 0) {
-        // Child process: exec /bin/tamper_log
+        // Child process:  exec tamper_log
+        fprintf(stderr, "[DEBUG] Executing:  %s --type %s --details %s\n", 
+                TAMPER_LOG_BIN, tamper_type, details ?  details : "");
+        
         if (details) {
-            execl(TAMPER_LOG_BIN, "tamper_log", "--type", tamper_type, "--details", details, (char *)NULL);
+            execl(TAMPER_LOG_BIN, TAMPER_LOG_BIN, "--type", tamper_type, 
+                  "--details", details, (char *)NULL);
         } else {
-            execl(TAMPER_LOG_BIN, "tamper_log", "--type", tamper_type, (char *)NULL);
+            execl(TAMPER_LOG_BIN, TAMPER_LOG_BIN, "--type", tamper_type, (char *)NULL);
         }
-        perror("execl failed for /bin/tamper_log");
+        
+        // If execl returns, it failed
+        perror("[ERROR] execl failed");
+        fprintf(stderr, "[ERROR] Failed to execute:  %s\n", TAMPER_LOG_BIN);
         _exit(127);
     }
+    
+    // Parent process:  wait for child
     int status;
     if (waitpid(pid, &status, 0) < 0) {
-        perror("waitpid");
+        perror("[ERROR] waitpid failed");
         return -1;
     }
-    if (WIFEXITED(status)) return WEXITSTATUS(status);
+    
+    if (WIFEXITED(status)) {
+        int exit_code = WEXITSTATUS(status);
+        if (exit_code == 0) {
+            fprintf(stderr, "[SUCCESS] Tamper event logged successfully\n");
+            return 0;
+        } else {
+            fprintf(stderr, "[ERROR] tamper_log exited with code: %d\n", exit_code);
+            return -1;
+        }
+    }
+    
     return -1;
 }
+
+// --- Call activate_safe_mode binary ---
+/*int activate_safe_mode(void) {
+    // First, verify the binary exists and is executable
+    if (access(SAFE_MODE_BIN, F_OK) != 0) {
+        fprintf(stderr, "[ERROR] activate_safe_mode binary not found at:  %s\n", SAFE_MODE_BIN);
+        return -1;
+    }
+    
+    if (access(SAFE_MODE_BIN, X_OK) != 0) {
+        fprintf(stderr, "[ERROR] activate_safe_mode binary not executable: %s\n", SAFE_MODE_BIN);
+        fprintf(stderr, "[ERROR] Attempting to fix permissions...\n");
+        char chmod_cmd[512];
+        snprintf(chmod_cmd, sizeof(chmod_cmd), "sudo chmod +x %s", SAFE_MODE_BIN);
+        system(chmod_cmd);
+    }
+    
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("[ERROR] fork failed");
+        return -1;
+    }
+    
+    if (pid == 0) {
+        // Child process
+        fprintf(stderr, "[DEBUG] Executing: %s %s\n", SAFE_MODE_BIN, CONFIG_FILE);
+        execl(SAFE_MODE_BIN, SAFE_MODE_BIN, CONFIG_FILE, (char *)NULL);
+        
+        perror("[ERROR] execl failed");
+        fprintf(stderr, "[ERROR] Failed to execute: %s\n", SAFE_MODE_BIN);
+        _exit(127);
+    }
+    
+    // Parent process:  wait for child
+    int status;
+    if (waitpid(pid, &status, 0) < 0) {
+        perror("[ERROR] waitpid failed");
+        return -1;
+    }
+    
+    if (WIFEXITED(status)) {
+        int exit_code = WEXITSTATUS(status);
+        fprintf(stderr, "[DEBUG] activate_safe_mode exited with code: %d\n", exit_code);
+        return exit_code;
+    }
+    
+    return -1;
+}*/
 
 // --- Initialize GPIO ---
 int init_gpio(void) {
     chip = gpiod_chip_open_by_name(chipname);
-    if (!chip) {
+    if (! chip) {
         perror("Error opening GPIO chip");
         return -1;
     }
@@ -217,15 +302,26 @@ int main(void) {
     }
 
     // --- Initialize GPIO ---
-    printf("[Init] Initializing GPIO %s:%u...\n", chipname, line_offset);
+    printf("[Init] Initializing GPIO %s:%u.. .\n", chipname, line_offset);
     if (init_gpio() != 0) {
         fprintf(stderr, "Failed to initialize GPIO!\n");
         return 1;
     }
 
-    // NOTE: LCD is NOT initialized here. It is only touched during tamper events.
+    // --- Verify tamper_log binary exists ---
+    printf("[Init] Verifying tamper_log binary at:  %s\n", TAMPER_LOG_BIN);
+    if (access(TAMPER_LOG_BIN, F_OK) != 0) {
+        fprintf(stderr, "[WARNING] tamper_log binary not found!\n");
+        fprintf(stderr, "[WARNING] Tamper events will not be logged to database\n");
+    } else if (access(TAMPER_LOG_BIN, X_OK) != 0) {
+        fprintf(stderr, "[WARNING] tamper_log binary exists but is not executable\n");
+        fprintf(stderr, "[ACTION] Making tamper_log executable.. .\n");
+        system("sudo chmod +x /home/pico/calibris/bin/tamper_log_bin/tamper_log");
+    } else {
+        printf("[OK] tamper_log binary is ready\n");
+    }
 
-    printf("[Monitor] System ready. Monitoring for magnetic tamper...\n");
+    printf("[Monitor] System ready.  Monitoring for magnetic tamper.. .\n");
     printf("[Monitor] Press Ctrl+C to exit.\n\n");
 
     bool tampered_state = false;
@@ -238,7 +334,7 @@ int main(void) {
             break;
         }
 
-        // --- TAMPER DETECTED (Rising Edge: LOW -> HIGH) ---
+        // --- TAMPER DETECTED (Rising Edge:  LOW -> HIGH) ---
         if (gpio_value == 1 && !tampered_state) {
             tampered_state = true;
 
@@ -247,17 +343,27 @@ int main(void) {
 
             printf("\n");
             printf("+-------------------------------------------------------+\n");
-            printf("|   WARNING: TAMPER DETECTED!                           |\n");
+            printf("|   WARNING: TAMPER DETECTED!                            |\n");
             printf("+-------------------------------------------------------+\n");
             printf("|  Time             : %-34s|\n", timestamp);
             printf("+-------------------------------------------------------+\n");
 
-            // 1. Log to database via /bin/tamper_log
-            log_tamper_event("magnetic", "Magnet removed from sensor");
+            // 1. Log to database via tamper_log binary
+            printf("[Action] Logging tamper event to database...\n");
+            if (log_tamper_event("magnetic", "Magnet removed from sensor") == 0) {
+                printf("[OK] Tamper event logged successfully\n");
+            } else {
+                printf("[WARNING] Failed to log tamper event - continuing anyway\n");
+            }
 
             // 2. STOP weight measurement service FIRST (Release resources)
-            printf("[Action] Stopping measure_weight.service...\n");
-            system("systemctl stop measure_weight.service");
+            printf("[Action] Stopping measure_weight. service...\n");
+            int ret = system("systemctl stop measure_weight.service");
+            if (ret == 0) {
+                printf("[OK] measure_weight.service stopped\n");
+            } else {
+                printf("[WARNING] Failed to stop measure_weight.service\n");
+            }
 
             // 3. Initialize LCD (Only now that service is stopped)
             printf("[Action] Initializing LCD for warning display...\n");
@@ -265,15 +371,24 @@ int main(void) {
                 lcd_is_active = true;
                 lcd_clear();
                 lcd_set_cursor(0, 0);
-                lcd_send_string("!! SAFE MODE !!");
+                lcd_send_string("!!  SAFE MODE ! !");
                 lcd_set_cursor(1, 0);
                 lcd_send_string("Remove Magnet");
+                printf("[OK] LCD initialized and displaying warning\n");
             } else {
-                fprintf(stderr, "[Error] Failed to initialize LCD during tamper event!\n");
+                fprintf(stderr, "[ERROR] Failed to initialize LCD during tamper event!\n");
             }
+
+            // 4. Activate safe mode
+            /*printf("[Action] Activating safe mode...\n");
+            if (activate_safe_mode() == 0) {
+                printf("[OK] Safe mode activated\n");
+            } else {
+                printf("[WARNING] Safe mode activation may have failed\n");
+            }*/
         }
 
-        // --- TAMPER CLEARED (Falling Edge: HIGH -> LOW) ---
+        // --- TAMPER CLEARED (Falling Edge:  HIGH -> LOW) ---
         else if (gpio_value == 0 && tampered_state) {
             tampered_state = false;
 
@@ -284,20 +399,26 @@ int main(void) {
             printf("+-------------------------------------------------------+\n");
             printf("|   OK: TAMPER CLEARED                                  |\n");
             printf("+-------------------------------------------------------+\n");
-            printf("|  Time             : %-34s|\n", timestamp);
+            printf("|  Time             :  %-34s|\n", timestamp);
             printf("+-------------------------------------------------------+\n");
 
             // 1. Close/Release LCD FIRST (Free resources for service)
             if (lcd_is_active) {
-                printf("[Action] Closing LCD...\n");
-                lcd_clear(); // Optional: Clear screen before closing
+                printf("[Action] Closing LCD.. .\n");
+                lcd_clear();
                 lcd_close();
                 lcd_is_active = false;
+                printf("[OK] LCD closed\n");
             }
 
             // 2. START weight measurement service
-            printf("[Action] Starting measure_weight.service...\n");
-            system("systemctl start measure_weight.service");
+            printf("[Action] Starting measure_weight.service.. .\n");
+            int ret = system("systemctl start measure_weight.service");
+            if (ret == 0) {
+                printf("[OK] measure_weight.service started\n");
+            } else {
+                printf("[WARNING] Failed to start measure_weight.service\n");
+            }
         }
 
         usleep(100000);  // 100ms polling interval

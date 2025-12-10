@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/i2c-dev.h>
-#include <linux/gpio.h>
+#include <linux/gpio.h>   // still used for other things? kept for safety, but not needed for tare now
 #include <errno.h>
 #include <termios.h>
 #include <signal.h>
@@ -13,18 +13,18 @@
 #include <stdint.h>
 #include <ctype.h>
 #include <sys/wait.h>
+#include <gpiod.h>        // NEW: use libgpiod for tare
 
 // Configuration
 #define CONFIG_FILE "/home/pico/calibris/data/config.json"
 #define I2C_DEVICE "/dev/i2c-3"
 #define I2C_ADDR 0x27
-// FIX: Removed space in service name
 #define MW7_SERVICE "measure_weight.service"
 #define SAFE_MODE_SERVICE "safe_mode.service"
 
-// TARE Button GPIO Configuration (Bypass)
-#define GPIO_CHIP_DEVICE "/dev/gpiochip2"
-#define TARE_PIN 0
+// TARE Button GPIO Configuration (Bypass) - MATCH mw9.c
+#define TARE_CHIP "gpiochip1"
+#define TARE_PIN  19  // same as mw9.c (gpiochip1, offset 19)
 
 // TOTP Configuration
 #define MASTER_SECRET "MY_SUPER_SECRET_COMPANY_MASTER_KEY"
@@ -34,7 +34,6 @@
 // PCF8574 to LCD Pin Mapping
 #define LCD_RS 0x01
 #define LCD_RW 0x02
-// FIX: Removed invisible/bad char in definition
 #define LCD_E  0x04
 #define LCD_BACKLIGHT 0x08
 
@@ -48,13 +47,16 @@
 
 // Global file descriptors
 int i2c_fd = -1;
-int gpio_line_fd = -1;
 
 // Terminal settings for restoring later
 struct termios old_tio, new_tio;
 
 // Device ID from config
 char device_id[64] = "";
+
+// libgpiod handles for TARE button
+struct gpiod_chip *chip_tare = NULL;
+struct gpiod_line *tare_line = NULL;
 
 // --- HMAC-SHA1 Implementation ---
 
@@ -83,8 +85,10 @@ typedef struct {
 void sha1_transform(uint32_t state[5], const uint8_t buffer[64]) {
     uint32_t a, b, c, d, e;
     uint32_t block[16];
+
     memcpy(block, buffer, 64);
     a = state[0]; b = state[1]; c = state[2]; d = state[3]; e = state[4];
+
     R0(a, b, c, d, e, 0);  R0(e, a, b, c, d, 1);  R0(d, e, a, b, c, 2);  R0(c, d, e, a, b, 3);
     R0(b, c, d, e, a, 4);  R0(a, b, c, d, e, 5);  R0(e, a, b, c, d, 6);  R0(d, e, a, b, c, 7);
     R0(c, d, e, a, b, 8);  R0(b, c, d, e, a, 9);  R0(a, b, c, d, e, 10); R0(e, a, b, c, d, 11);
@@ -105,6 +109,7 @@ void sha1_transform(uint32_t state[5], const uint8_t buffer[64]) {
     R4(c, d, e, a, b, 68); R4(b, c, d, e, a, 69); R4(a, b, c, d, e, 70); R4(e, a, b, c, d, 71);
     R4(d, e, a, b, c, 72); R4(c, d, e, a, b, 73); R4(b, c, d, e, a, 74); R4(a, b, c, d, e, 75);
     R4(e, a, b, c, d, 76); R4(d, e, a, b, c, 77); R4(c, d, e, a, b, 78); R4(b, c, d, e, a, 79);
+
     state[0] += a; state[1] += b; state[2] += c; state[3] += d; state[4] += e;
 }
 
@@ -134,11 +139,17 @@ void sha1_update(SHA1_CTX *context, const uint8_t *data, size_t len) {
 void sha1_final(uint8_t digest[SHA1_DIGEST_SIZE], SHA1_CTX *context) {
     uint8_t finalcount[8];
     uint8_t c;
-    for (int i = 0; i < 8; i++) finalcount[i] = (uint8_t)((context->count[(i >= 4 ? 0 : 1)] >> ((3 - (i & 3)) * 8)) & 255);
-    c = 0200; sha1_update(context, &c, 1);
-    while ((context->count[0] & 504) != 448) { c = 0000; sha1_update(context, &c, 1); }
+    for (int i = 0; i < 8; i++)
+        finalcount[i] = (uint8_t)((context->count[(i >= 4 ? 0 : 1)] >> ((3 - (i & 3)) * 8)) & 255);
+    c = 0200;
+    sha1_update(context, &c, 1);
+    while ((context->count[0] & 504) != 448) {
+        c = 0000;
+        sha1_update(context, &c, 1);
+    }
     sha1_update(context, finalcount, 8);
-    for (int i = 0; i < SHA1_DIGEST_SIZE; i++) digest[i] = (uint8_t)((context->state[i >> 2] >> ((3 - (i & 3)) * 8)) & 255);
+    for (int i = 0; i < SHA1_DIGEST_SIZE; i++)
+        digest[i] = (uint8_t)((context->state[i >> 2] >> ((3 - (i & 3)) * 8)) & 255);
 }
 
 void sha1(const uint8_t *data, size_t len, uint8_t digest[SHA1_DIGEST_SIZE]) {
@@ -153,15 +164,27 @@ void hmac_sha1(const uint8_t *key, size_t key_len, const uint8_t *data, size_t d
     uint8_t k_opad[SHA1_BLOCK_SIZE];
     uint8_t tk[SHA1_DIGEST_SIZE];
     uint8_t inner_digest[SHA1_DIGEST_SIZE];
-    if (key_len > SHA1_BLOCK_SIZE) { sha1(key, key_len, tk); key = tk; key_len = SHA1_DIGEST_SIZE; }
+
+    if (key_len > SHA1_BLOCK_SIZE) {
+        sha1(key, key_len, tk);
+        key = tk;
+        key_len = SHA1_DIGEST_SIZE;
+    }
+
     memset(k_ipad, 0x36, SHA1_BLOCK_SIZE);
     memset(k_opad, 0x5c, SHA1_BLOCK_SIZE);
-    for (size_t i = 0; i < key_len; i++) { k_ipad[i] ^= key[i]; k_opad[i] ^= key[i]; }
+
+    for (size_t i = 0; i < key_len; i++) {
+        k_ipad[i] ^= key[i];
+        k_opad[i] ^= key[i];
+    }
+
     SHA1_CTX context;
     sha1_init(&context);
     sha1_update(&context, k_ipad, SHA1_BLOCK_SIZE);
     sha1_update(&context, data, data_len);
     sha1_final(inner_digest, &context);
+
     sha1_init(&context);
     sha1_update(&context, k_opad, SHA1_BLOCK_SIZE);
     sha1_update(&context, inner_digest, SHA1_DIGEST_SIZE);
@@ -171,7 +194,13 @@ void hmac_sha1(const uint8_t *key, size_t key_len, const uint8_t *data, size_t d
 // --- HMAC-SHA256 ---
 #define SHA256_BLOCK_SIZE 64
 #define SHA256_DIGEST_SIZE 32
-typedef struct { uint32_t state[8]; uint64_t count; uint8_t buffer[64]; } SHA256_CTX;
+
+typedef struct {
+    uint32_t state[8];
+    uint64_t count;
+    uint8_t buffer[64];
+} SHA256_CTX;
+
 static const uint32_t K256[64] = {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -182,6 +211,7 @@ static const uint32_t K256[64] = {
     0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
+
 #define ROR32(x, n) (((x) >> (n)) | ((x) << (32 - (n))))
 #define CH(x, y, z) (((x) & (y)) ^ (~(x) & (z)))
 #define MAJ(x, y, z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
@@ -193,20 +223,57 @@ static const uint32_t K256[64] = {
 void sha256_transform(SHA256_CTX *ctx, const uint8_t data[64]) {
     uint32_t a, b, c, d, e, f, g, h, t1, t2, m[64];
     int i;
-    for (i = 0; i < 16; i++) m[i] = ((uint32_t)data[i*4] << 24) | ((uint32_t)data[i*4+1] << 16) | ((uint32_t)data[i*4+2] << 8) | ((uint32_t)data[i*4+3]);
-    for (; i < 64; i++) m[i] = SIG1(m[i-2]) + m[i-7] + SIG0(m[i-15]) + m[i-16];
-    a = ctx->state[0]; b = ctx->state[1]; c = ctx->state[2]; d = ctx->state[3]; e = ctx->state[4]; f = ctx->state[5]; g = ctx->state[6]; h = ctx->state[7];
+
+    for (i = 0; i < 16; i++)
+        m[i] = ((uint32_t)data[i*4] << 24) |
+               ((uint32_t)data[i*4+1] << 16) |
+               ((uint32_t)data[i*4+2] << 8) |
+               ((uint32_t)data[i*4+3]);
+
+    for (; i < 64; i++)
+        m[i] = SIG1(m[i-2]) + m[i-7] + SIG0(m[i-15]) + m[i-16];
+
+    a = ctx->state[0];
+    b = ctx->state[1];
+    c = ctx->state[2];
+    d = ctx->state[3];
+    e = ctx->state[4];
+    f = ctx->state[5];
+    g = ctx->state[6];
+    h = ctx->state[7];
+
     for (i = 0; i < 64; i++) {
         t1 = h + EP1(e) + CH(e, f, g) + K256[i] + m[i];
         t2 = EP0(a) + MAJ(a, b, c);
-        h = g; g = f; f = e; e = d + t1; d = c; c = b; b = a; a = t1 + t2;
+        h = g;
+        g = f;
+        f = e;
+        e = d + t1;
+        d = c;
+        c = b;
+        b = a;
+        a = t1 + t2;
     }
-    ctx->state[0] += a; ctx->state[1] += b; ctx->state[2] += c; ctx->state[3] += d; ctx->state[4] += e; ctx->state[5] += f; ctx->state[6] += g; ctx->state[7] += h;
+
+    ctx->state[0] += a;
+    ctx->state[1] += b;
+    ctx->state[2] += c;
+    ctx->state[3] += d;
+    ctx->state[4] += e;
+    ctx->state[5] += f;
+    ctx->state[6] += g;
+    ctx->state[7] += h;
 }
 
 void sha256_init(SHA256_CTX *ctx) {
-    ctx->state[0] = 0x6a09e667; ctx->state[1] = 0xbb67ae85; ctx->state[2] = 0x3c6ef372; ctx->state[3] = 0xa54ff53a;
-    ctx->state[4] = 0x510e527f; ctx->state[5] = 0x9b05688c; ctx->state[6] = 0x1f83d9ab; ctx->state[7] = 0x5be0cd19;
+    ctx->state[0] = 0x6a09e667;
+    ctx->state[1] = 0xbb67ae85;
+    ctx->state[2] = 0x3c6ef372;
+    ctx->state[3] = 0xa54ff53a;
+    ctx->state[4] = 0x510e527f;
+    ctx->state[5] = 0x9b05688c;
+    ctx->state[6] = 0x1f83d9ab;
+    ctx->state[7] = 0x5be0cd19;
     ctx->count = 0;
 }
 
@@ -215,7 +282,8 @@ void sha256_update(SHA256_CTX *ctx, const uint8_t *data, size_t len) {
     for (i = 0; i < len; i++) {
         ctx->buffer[ctx->count % 64] = data[i];
         ctx->count++;
-        if (ctx->count % 64 == 0) sha256_transform(ctx, ctx->buffer);
+        if (ctx->count % 64 == 0)
+            sha256_transform(ctx, ctx->buffer);
     }
 }
 
@@ -223,30 +291,65 @@ void sha256_final(SHA256_CTX *ctx, uint8_t hash[32]) {
     uint64_t bits = ctx->count * 8;
     size_t pad_len = (ctx->count % 64 < 56) ? (56 - ctx->count % 64) : (120 - ctx->count % 64);
     uint8_t pad[128] = {0x80};
+
     sha256_update(ctx, pad, pad_len);
+
     uint8_t len_be[8];
-    for (int i = 0; i < 8; i++) len_be[i] = (bits >> (56 - i * 8)) & 0xff;
+    for (int i = 0; i < 8; i++)
+        len_be[i] = (bits >> (56 - i * 8)) & 0xff;
+
     sha256_update(ctx, len_be, 8);
+
     for (int i = 0; i < 8; i++) {
-        hash[i*4] = (ctx->state[i] >> 24) & 0xff; hash[i*4+1] = (ctx->state[i] >> 16) & 0xff;
-        hash[i*4+2] = (ctx->state[i] >> 8) & 0xff; hash[i*4+3] = ctx->state[i] & 0xff;
+        hash[i*4]   = (ctx->state[i] >> 24) & 0xff;
+        hash[i*4+1] = (ctx->state[i] >> 16) & 0xff;
+        hash[i*4+2] = (ctx->state[i] >> 8) & 0xff;
+        hash[i*4+3] = ctx->state[i] & 0xff;
     }
 }
 
 void hmac_sha256(const uint8_t *key, size_t key_len, const uint8_t *data, size_t data_len, uint8_t *digest) {
-    uint8_t k_ipad[SHA256_BLOCK_SIZE]; uint8_t k_opad[SHA256_BLOCK_SIZE]; uint8_t tk[SHA256_DIGEST_SIZE]; uint8_t inner_digest[SHA256_DIGEST_SIZE];
-    if (key_len > SHA256_BLOCK_SIZE) { SHA256_CTX ctx; sha256_init(&ctx); sha256_update(&ctx, key, key_len); sha256_final(&ctx, tk); key = tk; key_len = SHA256_DIGEST_SIZE; }
-    memset(k_ipad, 0x36, SHA256_BLOCK_SIZE); memset(k_opad, 0x5c, SHA256_BLOCK_SIZE);
-    for (size_t i = 0; i < key_len; i++) { k_ipad[i] ^= key[i]; k_opad[i] ^= key[i]; }
-    SHA256_CTX ctx; sha256_init(&ctx); sha256_update(&ctx, k_ipad, SHA256_BLOCK_SIZE); sha256_update(&ctx, data, data_len); sha256_final(&ctx, inner_digest);
-    sha256_init(&ctx); sha256_update(&ctx, k_opad, SHA256_BLOCK_SIZE); sha256_update(&ctx, inner_digest, SHA256_DIGEST_SIZE); sha256_final(&ctx, digest);
+    uint8_t k_ipad[SHA256_BLOCK_SIZE];
+    uint8_t k_opad[SHA256_BLOCK_SIZE];
+    uint8_t tk[SHA256_DIGEST_SIZE];
+    uint8_t inner_digest[SHA256_DIGEST_SIZE];
+
+    if (key_len > SHA256_BLOCK_SIZE) {
+        SHA256_CTX ctx;
+        sha256_init(&ctx);
+        sha256_update(&ctx, key, key_len);
+        sha256_final(&ctx, tk);
+        key = tk;
+        key_len = SHA256_DIGEST_SIZE;
+    }
+
+    memset(k_ipad, 0x36, SHA256_BLOCK_SIZE);
+    memset(k_opad, 0x5c, SHA256_BLOCK_SIZE);
+
+    for (size_t i = 0; i < key_len; i++) {
+        k_ipad[i] ^= key[i];
+        k_opad[i] ^= key[i];
+    }
+
+    SHA256_CTX ctx;
+    sha256_init(&ctx);
+    sha256_update(&ctx, k_ipad, SHA256_BLOCK_SIZE);
+    sha256_update(&ctx, data, data_len);
+    sha256_final(&ctx, inner_digest);
+
+    sha256_init(&ctx);
+    sha256_update(&ctx, k_opad, SHA256_BLOCK_SIZE);
+    sha256_update(&ctx, inner_digest, SHA256_DIGEST_SIZE);
+    sha256_final(&ctx, digest);
 }
 
 // --- TOTP Functions ---
 
 void get_device_key(const char *product_id, uint8_t device_key[20]) {
     uint8_t full_hash[SHA256_DIGEST_SIZE];
-    hmac_sha256((const uint8_t *)MASTER_SECRET, strlen(MASTER_SECRET), (const uint8_t *)product_id, strlen(product_id), full_hash);
+    hmac_sha256((const uint8_t *)MASTER_SECRET, strlen(MASTER_SECRET),
+                (const uint8_t *)product_id, strlen(product_id),
+                full_hash);
     memcpy(device_key, full_hash, 20);
 }
 
@@ -254,11 +357,21 @@ uint32_t generate_totp(const char *product_id, uint64_t counter) {
     uint8_t device_key[20];
     uint8_t counter_bytes[8];
     uint8_t digest[SHA1_DIGEST_SIZE];
+
     get_device_key(product_id, device_key);
-    for (int i = 7; i >= 0; i--) { counter_bytes[i] = counter & 0xff; counter >>= 8; }
+
+    for (int i = 7; i >= 0; i--) {
+        counter_bytes[i] = counter & 0xff;
+        counter >>= 8;
+    }
+
     hmac_sha1(device_key, 20, counter_bytes, 8, digest);
+
     int offset = digest[SHA1_DIGEST_SIZE - 1] & 0x0f;
-    uint32_t code_binary = ((digest[offset] & 0x7f) << 24) | ((digest[offset + 1] & 0xff) << 16) | ((digest[offset + 2] & 0xff) << 8) | (digest[offset + 3] & 0xff);
+    uint32_t code_binary = ((digest[offset] & 0x7f) << 24) |
+                           ((digest[offset + 1] & 0xff) << 16) |
+                           ((digest[offset + 2] & 0xff) << 8)  |
+                           (digest[offset + 3] & 0xff);
     return code_binary % 1000000;
 }
 
@@ -266,6 +379,7 @@ int verify_totp(const char *product_id, const char *token_str) {
     time_t current_time = time(NULL);
     uint64_t current_counter = current_time / TIME_STEP;
     uint32_t input_token = (uint32_t)atoi(token_str);
+
     printf("Verifying token for device: %s\n", product_id);
     for (int i = -TOKEN_VALIDITY_WINDOW; i <= TOKEN_VALIDITY_WINDOW; i++) {
         uint64_t check_counter = current_counter + i;
@@ -275,54 +389,51 @@ int verify_totp(const char *product_id, const char *token_str) {
     return 0;
 }
 
-// --- GPIO Functions for TARE Button (using ioctl) ---
+// --- TARE Button using libgpiod (SAME AS mw9.c chip/pin) ---
 
 int tare_gpio_init() {
-    int chip_fd = open(GPIO_CHIP_DEVICE, O_RDWR);
-    if (chip_fd < 0) {
-        perror("Failed to open GPIO chip");
+    chip_tare = gpiod_chip_open_by_name(TARE_CHIP);
+    if (!chip_tare) {
+        perror("[TARE] Failed to open gpiochip1");
         return -1;
     }
 
-    struct gpiohandle_request req;
-    memset(&req, 0, sizeof(req));
-    req.lineoffsets[0] = TARE_PIN;
-    req.lines = 1;
-    // FIX: Removed typo in flags access
-    req.flags = GPIOHANDLE_REQUEST_INPUT;
-    strcpy(req.consumer_label, "safe_mode_bypass");
-
-    if (ioctl(chip_fd, GPIO_GET_LINEHANDLE_IOCTL, &req) < 0) {
-        perror("Failed to get GPIO line handle");
-        close(chip_fd);
+    tare_line = gpiod_chip_get_line(chip_tare, TARE_PIN);
+    if (!tare_line) {
+        perror("[TARE] Failed to get line 19");
+        gpiod_chip_close(chip_tare);
+        chip_tare = NULL;
         return -1;
     }
 
-    close(chip_fd);
-    gpio_line_fd = req.fd;
-    printf("GPIO Bypass initialized on %s, pin %d\n", GPIO_CHIP_DEVICE, TARE_PIN);
+    if (gpiod_line_request_input(tare_line, "safe_mode_tare") < 0) {
+        perror("[TARE] Failed to request input line");
+        gpiod_chip_close(chip_tare);
+        chip_tare = NULL;
+        tare_line = NULL;
+        return -1;
+    }
+
+    printf("[TARE] Button initialized on %s, pin %d\n", TARE_CHIP, TARE_PIN);
     return 0;
 }
 
 void tare_gpio_close() {
-    if (gpio_line_fd >= 0) {
-        close(gpio_line_fd);
-        gpio_line_fd = -1;
+    if (tare_line) {
+        gpiod_line_release(tare_line);
+        tare_line = NULL;
+    }
+    if (chip_tare) {
+        gpiod_chip_close(chip_tare);
+        chip_tare = NULL;
     }
 }
 
 int is_tare_button_pressed() {
-    if (gpio_line_fd < 0) return 0;
-
-    struct gpiohandle_data data;
-    memset(&data, 0, sizeof(data));
-
-    if (ioctl(gpio_line_fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL, &data) < 0) {
-        return 0;
-    }
-    // FIX: Assuming Active LOW (Pin -> Switch -> GND), pressed = 0.
-    // Invert the result to return true when pressed.
-    return (data.values[0] == 1);
+    if (!tare_line) return 0;
+    int v = gpiod_line_get_value(tare_line);
+    // Assume active HIGH like in mw9.c
+    return (v == 1);
 }
 
 // --- Terminal Functions ---
@@ -331,7 +442,6 @@ void init_terminal() {
     if (!isatty(STDIN_FILENO)) return; // Don't mess with TTY if not interactive
     tcgetattr(STDIN_FILENO, &old_tio);
     new_tio = old_tio;
-    // FIX: Typos in struct access
     new_tio.c_lflag &= ~(ICANON | ECHO);
     new_tio.c_cc[VMIN] = 0;
     new_tio.c_cc[VTIME] = 0;
@@ -358,23 +468,26 @@ void lcd_pulse_enable(int data) {
     if (i2c_fd < 0) return;
     unsigned char buf1 = data | LCD_E;
     unsigned char buf2 = data & ~LCD_E;
-    write(i2c_fd, &buf1, 1); usleep(500); write(i2c_fd, &buf2, 1); usleep(500);
+    write(i2c_fd, &buf1, 1); usleep(500);
+    write(i2c_fd, &buf2, 1); usleep(500);
 }
 
 void lcd_write_4bits(int data) {
     if (i2c_fd < 0) return;
     unsigned char buf = data | LCD_BACKLIGHT;
-    write(i2c_fd, &buf, 1); lcd_pulse_enable(data | LCD_BACKLIGHT);
+    write(i2c_fd, &buf, 1);
+    lcd_pulse_enable(data | LCD_BACKLIGHT);
 }
 
 void lcd_send(int value, int mode) {
     int high_nibble = value & 0xF0;
-    int low_nibble = (value << 4) & 0xF0;
-    lcd_write_4bits(high_nibble | mode); lcd_write_4bits(low_nibble | mode);
+    int low_nibble  = (value << 4) & 0xF0;
+    lcd_write_4bits(high_nibble | mode);
+    lcd_write_4bits(low_nibble  | mode);
 }
 
 void lcd_command(int cmd) { lcd_send(cmd, 0); }
-void lcd_data(int data) { lcd_send(data, LCD_RS); }
+void lcd_data(int data)   { lcd_send(data, LCD_RS); }
 
 void lcd_string(const char *s) { while (*s) lcd_data(*s++); }
 
@@ -387,23 +500,52 @@ void lcd_clear() { lcd_command(LCD_CLEARDISPLAY); usleep(2000); }
 
 int lcd_init() {
     if ((i2c_fd = open(I2C_DEVICE, O_RDWR)) < 0) return -1;
-    if (ioctl(i2c_fd, I2C_SLAVE, I2C_ADDR) < 0) { close(i2c_fd); i2c_fd = -1; return -1; }
-    usleep(50000); lcd_write_4bits(0x30); usleep(4500); lcd_write_4bits(0x30); usleep(4500); lcd_write_4bits(0x30); usleep(150); lcd_write_4bits(0x20);
-    lcd_command(LCD_FUNCTIONSET | 0x08); lcd_command(LCD_DISPLAYCONTROL | 0x04); lcd_command(LCD_ENTRYMODESET | 0x02); lcd_clear();
+    if (ioctl(i2c_fd, I2C_SLAVE, I2C_ADDR) < 0) {
+        close(i2c_fd);
+        i2c_fd = -1;
+        return -1;
+    }
+
+    usleep(50000);
+    lcd_write_4bits(0x30); usleep(4500);
+    lcd_write_4bits(0x30); usleep(4500);
+    lcd_write_4bits(0x30); usleep(150);
+    lcd_write_4bits(0x20);
+
+    lcd_command(LCD_FUNCTIONSET | 0x08);
+    lcd_command(LCD_DISPLAYCONTROL | 0x04);
+    lcd_command(LCD_ENTRYMODESET | 0x02);
+    lcd_clear();
     return 0;
 }
 
-void lcd_close() { if (i2c_fd >= 0) { unsigned char buf = 0x00; write(i2c_fd, &buf, 1); close(i2c_fd); i2c_fd = -1; } }
+void lcd_close() {
+    if (i2c_fd >= 0) {
+        unsigned char buf = 0x00;
+        write(i2c_fd, &buf, 1);
+        close(i2c_fd);
+        i2c_fd = -1;
+    }
+}
 
 // --- Config Parsing & Update ---
 
-char* skip_whitespace(char* s) { while (*s && isspace((unsigned char)*s)) s++; return s; }
+char* skip_whitespace(char* s) {
+    while (*s && isspace((unsigned char)*s)) s++;
+    return s;
+}
 
 int check_safe_mode() {
     FILE *fp = fopen(CONFIG_FILE, "r");
     if (fp == NULL) return 0;
-    char buffer[1024]; size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp); fclose(fp); buffer[len] = '\0';
-    char *key = "\"safe_mode\""; char *found = strstr(buffer, key);
+
+    char buffer[1024];
+    size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+    fclose(fp);
+    buffer[len] = '\0';
+
+    char *key = "\"safe_mode\"";
+    char *found = strstr(buffer, key);
     if (found) {
         char *ptr = skip_whitespace(found + strlen(key));
         if (*ptr == ':') {
@@ -417,38 +559,50 @@ int check_safe_mode() {
 int load_device_id() {
     FILE *fp = fopen(CONFIG_FILE, "r");
     if (fp == NULL) return -1;
-    char buffer[1024]; size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp); fclose(fp); buffer[len] = '\0';
+
+    char buffer[1024];
+    size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+    fclose(fp);
+    buffer[len] = '\0';
+
     char *start = strstr(buffer, "\"device_id\"");
     if (start == NULL) return -1;
+
     start = strchr(start + strlen("\"device_id\""), ':');
     if (start == NULL) return -1;
+
     start = skip_whitespace(start + 1);
+
     if (*start == '"') {
-        start++; char *end = strchr(start, '"');
+        start++;
+        char *end = strchr(start, '"');
         if (end == NULL) return -1;
         size_t id_len = end - start;
         if (id_len >= sizeof(device_id)) id_len = sizeof(device_id) - 1;
-        strncpy(device_id, start, id_len); device_id[id_len] = '\0';
+        strncpy(device_id, start, id_len);
+        device_id[id_len] = '\0';
     } else {
-        char *end = start; while (*end >= '0' && *end <= '9') end++;
+        char *end = start;
+        while (*end >= '0' && *end <= '9') end++;
         size_t id_len = end - start;
         if (id_len >= sizeof(device_id)) id_len = sizeof(device_id) - 1;
-        strncpy(device_id, start, id_len); device_id[id_len] = '\0';
+        strncpy(device_id, start, id_len);
+        device_id[id_len] = '\0';
     }
+
     printf("Loaded device_id: %s\n", device_id);
     return 0;
 }
 
-// --- UPDATE CONFIG: Set safe_mode to false ---
+// --- UPDATE CONFIG: Set safe_mode true/false ---
+
 int update_config_safe_mode(int enable_safe_mode) {
     FILE *fp = fopen(CONFIG_FILE, "r");
-    // FIX: Typo in if statement
     if (!fp) {
         perror("[config] Failed to open config file for reading");
         return -1;
     }
 
-    // Read entire file
     fseek(fp, 0, SEEK_END);
     long fsize = ftell(fp);
     fseek(fp, 0, SEEK_SET);
@@ -464,7 +618,6 @@ int update_config_safe_mode(int enable_safe_mode) {
     content[bytes_read] = '\0';
     fclose(fp);
 
-    // Find "safe_mode" key
     char *pos = strstr(content, "\"safe_mode\"");
     if (!pos) {
         fprintf(stderr, "[config] Error: 'safe_mode' key not found\n");
@@ -472,7 +625,6 @@ int update_config_safe_mode(int enable_safe_mode) {
         return -1;
     }
 
-    // Find the colon
     char *colon = strchr(pos, ':');
     if (!colon) {
         fprintf(stderr, "[config] Error: Invalid JSON format\n");
@@ -480,11 +632,9 @@ int update_config_safe_mode(int enable_safe_mode) {
         return -1;
     }
 
-    // Find the value start
     char *value_start = colon + 1;
     while (*value_start == ' ' || *value_start == '\t') value_start++;
 
-    // Determine current value and length
     int old_len;
     if (strncmp(value_start, "true", 4) == 0) {
         old_len = 4;
@@ -496,12 +646,10 @@ int update_config_safe_mode(int enable_safe_mode) {
         return -1;
     }
 
-    // Build new content
     const char *new_value = enable_safe_mode ? "true" : "false";
     int new_len = enable_safe_mode ? 4 : 5;
 
     size_t prefix_len = value_start - content;
-    // FIX: buffer safety check for suffix
     size_t suffix_len = strlen(value_start + old_len);
 
     char *new_content = malloc(prefix_len + new_len + suffix_len + 1);
@@ -513,9 +661,8 @@ int update_config_safe_mode(int enable_safe_mode) {
 
     memcpy(new_content, content, prefix_len);
     memcpy(new_content + prefix_len, new_value, new_len);
-    memcpy(new_content + prefix_len + new_len, value_start + old_len, suffix_len + 1); // Copies null terminator if size is correct
+    memcpy(new_content + prefix_len + new_len, value_start + old_len, suffix_len + 1);
 
-    // Write back
     fp = fopen(CONFIG_FILE, "w");
     if (!fp) {
         perror("[config] Failed to open config file for writing");
@@ -535,57 +682,52 @@ int update_config_safe_mode(int enable_safe_mode) {
 }
 
 // --- Disable safe_mode.service ---
+
 int disable_safe_mode_service() {
     printf("[service] Disabling %s...\n", SAFE_MODE_SERVICE);
-    
+
     pid_t pid = fork();
     if (pid < 0) {
         perror("fork failed");
         return -1;
     }
-    
+
     if (pid == 0) {
-        // Child process
         execl("/usr/bin/sudo", "sudo", "/usr/bin/systemctl", "disable", SAFE_MODE_SERVICE, (char *)NULL);
         perror("execl failed");
         _exit(127);
     }
-    
-    // Parent - wait for child
+
     int status;
     waitpid(pid, &status, 0);
-    
+
     if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
         printf("[service] Disabled %s\n", SAFE_MODE_SERVICE);
         return 0;
     }
-    
+
     fprintf(stderr, "[service] Warning: Could not disable %s\n", SAFE_MODE_SERVICE);
     return -1;
 }
 
 // --- Exit Safe Mode (Update config + Disable service + Start measure_weight) ---
+
 int exit_safe_mode() {
     printf("\n========================================\n");
     printf("  EXITING SAFE MODE\n");
     printf("========================================\n\n");
 
-    // Step 1: Update config.json (safe_mode = false)
     printf("[Step 1/3] Updating config.json...\n");
     if (update_config_safe_mode(0) != 0) {
         fprintf(stderr, "[ERROR] Failed to update config.json\n");
-        // Continue anyway - try to start service
     }
 
-    // Step 2: Disable safe_mode.service
     printf("\n[Step 2/3] Disabling safe_mode.service...\n");
     disable_safe_mode_service();
 
-    // Step 3: Enable and start measure_weight.service
-    // FIX: Using fork/exec instead of just exec, so we can return to main and cleanup properly
     printf("\n[Step 3/3] Starting measure_weight.service...\n");
     printf("Executing: sudo systemctl enable --now %s\n", MW7_SERVICE);
-    
+
     pid_t pid = fork();
     if (pid < 0) {
         perror("fork failed");
@@ -593,13 +735,11 @@ int exit_safe_mode() {
     }
 
     if (pid == 0) {
-        // Child process
         execl("/usr/bin/sudo", "sudo", "/usr/bin/systemctl", "enable", "--now", MW7_SERVICE, (char *)NULL);
         perror("execl failed");
         _exit(127);
     }
 
-    // Parent wait
     int status;
     waitpid(pid, &status, 0);
 
@@ -615,33 +755,73 @@ int exit_safe_mode() {
 // --- Token Verification ---
 
 int verify_clearance_token() {
-    char token[16]; int token_index = 0; char c;
-    lcd_clear(); lcd_set_cursor(0, 0); lcd_string("Enter Token: "); lcd_set_cursor(0, 1); lcd_string("______");
-    printf("\n\nEnter 6-digit clearance token: "); fflush(stdout);
+    char token[16];
+    int token_index = 0;
+    char c;
+
+    lcd_clear();
+    lcd_set_cursor(0, 0);
+    lcd_string("Enter Token: ");
+    lcd_set_cursor(0, 1);
+    lcd_string("______");
+
+    printf("\n\nEnter 6-digit clearance token: ");
+    fflush(stdout);
+
     enable_blocking_input();
     token_index = 0;
+
     while (token_index < 6) {
         if (read(STDIN_FILENO, &c, 1) > 0) {
             if (c >= '0' && c <= '9') {
-                token[token_index] = c; token_index++;
-                lcd_set_cursor(token_index - 1, 1); lcd_data('*');
-                printf("*"); fflush(stdout);
+                token[token_index] = c;
+                token_index++;
+
+                lcd_set_cursor(token_index - 1, 1);
+                lcd_data('*');
+
+                printf("*");
+                fflush(stdout);
             } else if ((c == 127 || c == 8) && token_index > 0) {
-                token_index--; lcd_set_cursor(token_index, 1); lcd_data('_');
-                printf("\b \b"); fflush(stdout);
+                token_index--;
+                lcd_set_cursor(token_index, 1);
+                lcd_data('_');
+                printf("\b \b");
+                fflush(stdout);
             } else if (c == 27 || c == 3) {
-                printf("\nToken entry cancelled.\n"); init_terminal(); return 0;
+                printf("\nToken entry cancelled.\n");
+                init_terminal();
+                return 0;
             }
         }
     }
-    token[6] = '\0'; printf("\n"); init_terminal();
-    lcd_clear(); lcd_set_cursor(0, 0); lcd_string("Verifying...");
+
+    token[6] = '\0';
+    printf("\n");
+    init_terminal();
+
+    lcd_clear();
+    lcd_set_cursor(0, 0);
+    lcd_string("Verifying...");
+
     if (verify_totp(device_id, token)) {
-        lcd_clear(); lcd_set_cursor(0, 0); lcd_string("Access Granted! "); lcd_set_cursor(0, 1); lcd_string("Exiting Safe...");
-        printf("Clearance token verified! Access granted.\n"); usleep(2000000); return 1;
+        lcd_clear();
+        lcd_set_cursor(0, 0);
+        lcd_string("Access Granted! ");
+        lcd_set_cursor(0, 1);
+        lcd_string("Exiting Safe...");
+        printf("Clearance token verified! Access granted.\n");
+        usleep(2000000);
+        return 1;
     } else {
-        lcd_clear(); lcd_set_cursor(0, 0); lcd_string("Access Denied! "); lcd_set_cursor(0, 1); lcd_string("Invalid Token");
-        printf("Invalid clearance token! Access denied.\n"); usleep(2000000); return 0;
+        lcd_clear();
+        lcd_set_cursor(0, 0);
+        lcd_string("Access Denied! ");
+        lcd_set_cursor(0, 1);
+        lcd_string("Invalid Token");
+        printf("Invalid clearance token! Access denied.\n");
+        usleep(2000000);
+        return 0;
     }
 }
 
@@ -650,10 +830,21 @@ int verify_clearance_token() {
 int handle_tare_bypass() {
     printf("\n*** TARE BUTTON BYPASS ACTIVATED ***\n");
     printf("Skipping TOTP authentication (DEV MODE)\n");
-    lcd_clear(); lcd_set_cursor(0, 0); lcd_string("** DEV BYPASS **"); lcd_set_cursor(0, 1); lcd_string("TARE Pressed!");
+
+    lcd_clear();
+    lcd_set_cursor(0, 0);
+    lcd_string("** DEV BYPASS **");
+    lcd_set_cursor(0, 1);
+    lcd_string("TARE Pressed!");
     usleep(1500000);
-    lcd_clear(); lcd_set_cursor(0, 0); lcd_string("Access Granted! "); lcd_set_cursor(0, 1); lcd_string("(Dev Mode)");
+
+    lcd_clear();
+    lcd_set_cursor(0, 0);
+    lcd_string("Access Granted! ");
+    lcd_set_cursor(0, 1);
+    lcd_string("(Dev Mode)");
     usleep(1500000);
+
     return 1;
 }
 
@@ -662,7 +853,10 @@ int handle_tare_bypass() {
 void cleanup_and_exit(int signum) {
     printf("\nReceived signal %d. Cleaning up...\n", signum);
     restore_terminal();
-    lcd_clear(); lcd_set_cursor(0, 0); lcd_string("Shutting Down..."); usleep(1000000);
+    lcd_clear();
+    lcd_set_cursor(0, 0);
+    lcd_string("Shutting Down...");
+    usleep(1000000);
     lcd_close();
     tare_gpio_close();
     exit(0);
@@ -674,20 +868,37 @@ int main() {
     printf("Calibris Safe Mode with TOTP Authentication\n");
     printf("============================================\n");
 
-    signal(SIGINT, cleanup_and_exit);
+    signal(SIGINT,  cleanup_and_exit);
     signal(SIGTERM, cleanup_and_exit);
 
-    if (load_device_id() != 0) { fprintf(stderr, "Failed to load device ID.\n"); return 1; }
-    if (!check_safe_mode()) { printf("Safe mode is DISABLED.\n"); return 0; }
+    if (load_device_id() != 0) {
+        fprintf(stderr, "Failed to load device ID.\n");
+        return 1;
+    }
+
+    if (!check_safe_mode()) {
+        printf("Safe mode is DISABLED.\n");
+        return 0;
+    }
 
     printf("Safe mode is ENABLED. Device ID: %s\n", device_id);
 
-    if (lcd_init() != 0) { fprintf(stderr, "Failed to initialize LCD.\n"); return 1; }
+    if (lcd_init() != 0) {
+        fprintf(stderr, "Failed to initialize LCD.\n");
+        return 1;
+    }
 
-    tare_gpio_init();
+    if (tare_gpio_init() != 0) {
+        fprintf(stderr, "Failed to init TARE GPIO (bypass button).\n");
+        // still continue safe-mode with token only
+    }
 
     init_terminal();
-    lcd_clear(); lcd_set_cursor(0, 0); lcd_string("** SAFE MODE **"); lcd_set_cursor(0, 1); lcd_string("Press ENTER...");
+    lcd_clear();
+    lcd_set_cursor(0, 0);
+    lcd_string("** SAFE MODE **");
+    lcd_set_cursor(0, 1);
+    lcd_string("Press ENTER...");
     printf("Safe mode active. Press ENTER to input token.\n");
     printf("Or press TARE button to bypass (DEV MODE).\n\n");
 
@@ -697,14 +908,18 @@ int main() {
     int tare_debounce = 0;
 
     while (1) {
-        // Check TARE button (Bypass)
+        // Check TARE button (Bypass) – same pin as mw9.c
         if (is_tare_button_pressed()) {
             tare_debounce++;
-            if (tare_debounce >= 3) {
+            if (tare_debounce >= 3) {  // crude debounce
                 if (handle_tare_bypass()) {
-                    lcd_clear(); lcd_set_cursor(0, 0); lcd_string("Exiting Safe"); lcd_set_cursor(0, 1); lcd_string("Mode...");
+                    lcd_clear();
+                    lcd_set_cursor(0, 0);
+                    lcd_string("Exiting Safe");
+                    lcd_set_cursor(0, 1);
+                    lcd_string("Mode...");
                     usleep(1000000);
-                    // Cleanup happens AFTER successful bypass logic but BEFORE exiting function
+
                     restore_terminal();
                     lcd_close();
                     tare_gpio_close();
@@ -721,15 +936,24 @@ int main() {
         if (read(STDIN_FILENO, &c, 1) > 0) {
             if (c == '\n' || c == '\r') {
                 if (verify_clearance_token()) {
-                    lcd_clear(); lcd_set_cursor(0, 0); lcd_string("Exiting Safe"); lcd_set_cursor(0, 1); lcd_string("Mode...");
+                    lcd_clear();
+                    lcd_set_cursor(0, 0);
+                    lcd_string("Exiting Safe");
+                    lcd_set_cursor(0, 1);
+                    lcd_string("Mode...");
                     usleep(1000000);
+
                     restore_terminal();
                     lcd_close();
                     tare_gpio_close();
                     exit_safe_mode();
                     return 0;
                 }
-                lcd_clear(); lcd_set_cursor(0, 0); lcd_string("** SAFE MODE **"); lcd_set_cursor(0, 1); lcd_string("Press ENTER...");
+                lcd_clear();
+                lcd_set_cursor(0, 0);
+                lcd_string("** SAFE MODE **");
+                lcd_set_cursor(0, 1);
+                lcd_string("Press ENTER...");
             }
         }
 
@@ -737,9 +961,11 @@ int main() {
         if (loop_counter >= 10) {
             loop_counter = 0;
             lcd_set_cursor(15, 0);
-            if (blink_state) lcd_data('*'); else lcd_data(' ');
+            if (blink_state) lcd_data('*');
+            else             lcd_data(' ');
             blink_state = !blink_state;
         }
+
         usleep(100000);
     }
 
@@ -748,3 +974,4 @@ int main() {
     tare_gpio_close();
     return 0;
 }
+
