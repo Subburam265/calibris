@@ -26,9 +26,11 @@
 // GPIO1_C1 (Pin 14) -> Offset 17
 // GPIO1_C2 (Pin 15) -> Offset 18
 // GPIO1_C3 (Pin 16) -> Offset 19
+// GPIO1_C6 (Pin 5)  -> Offset 22 (PWM)
 #define PIN_ENTER 17
 #define PIN_DECR  18
 #define PIN_INCR  19
+#define PIN_PWM   22 
 
 // --- TOTP Config ---
 #define MASTER_SECRET "MY_SUPER_SECRET_COMPANY_MASTER_KEY"
@@ -86,17 +88,13 @@ int lcd_init(const char* i2c_bus, int i2c_addr) {
         return -1;
     }
 
-    // --- Standard LCD initialization sequence ---
     lcd_send_byte(0x33, LCD_CMD);
     lcd_send_byte(0x32, LCD_CMD);
     lcd_send_byte(0x06, LCD_CMD);
     lcd_send_byte(0x0C, LCD_CMD);
     lcd_send_byte(0x28, LCD_CMD);
-    
-    // Clear display
     lcd_send_byte(0x01, LCD_CMD);
     usleep(2000);
-    
     usleep(5000);
     return 0;
 }
@@ -106,7 +104,6 @@ void lcd_clear() {
     usleep(2000);
 }
 
-// User provided: lcd_set_cursor(int row, int col)
 void lcd_set_cursor(int row, int col) {
     int row_offsets[] = {LINE1, LINE2};
     if (row >= 0 && row < 2) {
@@ -127,8 +124,6 @@ void lcd_close() {
     }
 }
 
-// --- Wrappers for Logic Compatibility ---
-// These map the logic calls (like turning cursor on/off) to your driver
 void lcd_command(int cmd) {
     lcd_send_byte(cmd, LCD_CMD);
 }
@@ -137,7 +132,7 @@ void lcd_data(int data) {
 }
 
 // ==========================================
-//       END LCD DRIVER IMPLEMENTATION
+//        END LCD DRIVER IMPLEMENTATION
 // ==========================================
 
 // --- Global Vars for App ---
@@ -146,6 +141,7 @@ struct gpiod_chip *chip = NULL;
 struct gpiod_line *line_enter = NULL;
 struct gpiod_line *line_decr = NULL;
 struct gpiod_line *line_incr = NULL;
+struct gpiod_line *line_pwm = NULL; 
 
 // --- HMAC-SHA1 Implementation ---
 #define SHA1_BLOCK_SIZE 64
@@ -286,21 +282,30 @@ int verify_totp(const char *product_id, const char *token_str) {
 int gpio_init() {
     chip = gpiod_chip_open_by_name(GPIO_CHIP);
     if (!chip) { perror("GPIO Chip"); return -1; }
-    
+
     line_enter = gpiod_chip_get_line(chip, PIN_ENTER);
     line_decr  = gpiod_chip_get_line(chip, PIN_DECR);
     line_incr  = gpiod_chip_get_line(chip, PIN_INCR);
+    line_pwm   = gpiod_chip_get_line(chip, PIN_PWM); // Init new pin
 
-    if (!line_enter || !line_decr || !line_incr) { fprintf(stderr, "Failed to get lines\n"); return -1; }
+    if (!line_enter || !line_decr || !line_incr || !line_pwm) { fprintf(stderr, "Failed to get lines\n"); return -1; }
 
     if (gpiod_line_request_input(line_enter, "sm_enter") < 0 ||
         gpiod_line_request_input(line_decr, "sm_decr") < 0 ||
         gpiod_line_request_input(line_incr, "sm_incr") < 0) {
         perror("Request input"); return -1;
     }
+
+    // Request PWM pin as OUTPUT
+    if (gpiod_line_request_output(line_pwm, "sm_pwm", 0) < 0) {
+        perror("Request PWM output failed"); return -1;
+    }
+
     return 0;
 }
 void gpio_close() {
+    // Turn off PWM before closing - ENSURE LOW (0)
+    if (line_pwm) { gpiod_line_set_value(line_pwm, 0); gpiod_line_release(line_pwm); }
     if (line_enter) gpiod_line_release(line_enter);
     if (line_decr)  gpiod_line_release(line_decr);
     if (line_incr)  gpiod_line_release(line_incr);
@@ -355,20 +360,20 @@ int exit_safe_mode() {
     return 0;
 }
 
-void cleanup(int s) { lcd_clear(); lcd_send_string("Shutting Down"); lcd_close(); gpio_close(); exit(0); }
+void cleanup(int s) { lcd_clear(); lcd_send_string("Shutting Down"); gpio_close(); lcd_close(); exit(0); }
 
 // --- Main State Machine ---
 int main() {
     signal(SIGINT, cleanup); signal(SIGTERM, cleanup);
-    
+
     if (load_device_id() != 0 || !check_safe_mode()) return 0;
-    
+
     // LCD Init with your custom driver
     if (lcd_init(I2C_BUS_DEVICE, I2C_ADDR_DEFAULT) != 0) {
         fprintf(stderr, "LCD Init Failed\n");
         return 1;
     }
-    
+
     if (gpio_init() != 0) return 1;
 
     enum { STATE_IDLE, STATE_TOKEN } state = STATE_IDLE;
@@ -378,22 +383,42 @@ int main() {
 
     int last_ent = 0, last_inc = 0, last_dec = 0;
     
-    lcd_clear(); 
-    lcd_send_string("** SAFE MODE **"); 
+    // PWM State Variables
+    int pwm_counter = 0;
+    int pwm_state = 0;
+
+    lcd_clear();
+    lcd_send_string("** SAFE MODE **");
     // User driver: set_cursor(row, col)
-    lcd_set_cursor(1, 0); 
+    lcd_set_cursor(1, 0);
     lcd_send_string("Press Enter...");
 
     while(1) {
         int ent = read_enter();
         int inc = read_incr();
         int dec = read_decr();
+        
+        // --- PWM Logic (0.5 duty ratio) ---
+        // Loop delay is 50ms.
+        // Toggle every 5 counts = 250ms high, 250ms low (2Hz)
+        pwm_counter++;
+        if (pwm_counter >= 5) {
+            pwm_state = !pwm_state;
+            gpiod_line_set_value(line_pwm, pwm_state);
+            pwm_counter = 0;
+        }
 
         if (state == STATE_IDLE) {
             if (inc && !last_inc) {
                 lcd_clear(); lcd_send_string("DEV BYPASS");
                 lcd_set_cursor(1, 0); lcd_send_string("Access Granted");
                 usleep(2000000);
+                
+                // === FIX: Ensure PWM LOW before Exit ===
+                gpiod_line_set_value(line_pwm, 0);
+                gpio_close();
+                // =======================================
+                
                 exit_safe_mode();
                 return 0;
             }
@@ -407,7 +432,7 @@ int main() {
                 lcd_set_cursor(1, 0);
                 lcd_command(0x0F); // Blink cursor ON
             }
-        } 
+        }
         else if (state == STATE_TOKEN) {
             int update_screen = 0;
 
@@ -447,20 +472,26 @@ int main() {
                     if (verify_totp(device_id, token)) {
                         lcd_set_cursor(1, 0); lcd_send_string("Success!");
                         usleep(1500000);
+                        
+                        // === FIX: Ensure PWM LOW before Exit ===
+                        gpiod_line_set_value(line_pwm, 0);
+                        gpio_close();
+                        // =======================================
+                        
                         exit_safe_mode();
                         return 0;
                     } else {
                         lcd_set_cursor(1, 0); lcd_send_string("Invalid Token");
                         usleep(2000000);
                         state = STATE_IDLE;
-                        lcd_clear(); lcd_send_string("** SAFE MODE **"); 
+                        lcd_clear(); lcd_send_string("** SAFE MODE **");
                         lcd_set_cursor(1, 0); lcd_send_string("Press Enter...");
                     }
                 }
             }
         }
         last_ent = ent; last_inc = inc; last_dec = dec;
-        usleep(50000);
+        usleep(50000); // 50ms loop delay
     }
     return 0;
 }

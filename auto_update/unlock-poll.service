@@ -1,0 +1,24 @@
+[Unit]
+Description=Calibris Remote Unlock Polling Service
+Documentation=https://github.com/Subburam265/calibris
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pico
+Group=pico
+WorkingDirectory=/home/pico/calibris/auto_update
+ExecStart=/bin/bash /home/pico/calibris/auto_update/unlock_poll.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+

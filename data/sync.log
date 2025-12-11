@@ -1894,3 +1894,198 @@
 [2025-12-10 22:01:35] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
 [2025-12-10 22:01:35] Updated last sync ID to: 185
 [2025-12-10 22:01:35] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 05:45:38] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 05:45:38] Last synced ID: 185
+[2025-12-11 05:45:38] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 05:45:38] Sending batch to API (1 logs)...
+[2025-12-11 05:45:38] Max log_id in batch: 186
+[2025-12-11 05:45:40] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 05:45:40] Updated last sync ID to: 186
+[2025-12-11 05:45:40] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 05:54:16] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 05:54:16] Last synced ID: 186
+[2025-12-11 05:54:16] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 05:54:16] Sending batch to API (1 logs)...
+[2025-12-11 05:54:16] Max log_id in batch: 187
+[2025-12-11 05:54:19] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 05:54:19] Updated last sync ID to: 187
+[2025-12-11 05:54:19] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 06:05:49] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 06:05:49] Last synced ID: 187
+[2025-12-11 06:05:49] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 06:05:49] Sending batch to API (1 logs)...
+[2025-12-11 06:05:49] Max log_id in batch: 188
+[2025-12-11 06:05:51] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 06:05:51] Updated last sync ID to: 188
+[2025-12-11 06:05:51] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 06:33:41] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 06:33:41] Last synced ID: 188
+[2025-12-11 06:33:42] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 06:33:42] Sending batch to API (1 logs)...
+[2025-12-11 06:33:42] Max log_id in batch: 189
+[2025-12-11 06:33:44] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 06:33:44] Updated last sync ID to: 189
+[2025-12-11 06:33:44] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 06:59:48] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 06:59:48] Last synced ID: 189
+[2025-12-11 06:59:48] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 06:59:48] Sending batch to API (1 logs)...
+[2025-12-11 06:59:48] Max log_id in batch: 190
+[2025-12-11 06:59:50] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 06:59:50] Updated last sync ID to: 190
+[2025-12-11 06:59:50] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 07:07:56] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 07:07:56] Last synced ID: 190
+[2025-12-11 07:07:56] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 07:07:56] Sending batch to API (1 logs)...
+[2025-12-11 07:07:56] Max log_id in batch: 191
+[2025-12-11 07:07:59] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 07:07:59] Updated last sync ID to: 191
+[2025-12-11 07:07:59] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 07:10:28] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 07:10:28] Last synced ID: 191
+[2025-12-11 07:10:28] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 07:10:28] Sending batch to API (1 logs)...
+[2025-12-11 07:10:28] Max log_id in batch: 192
+[2025-12-11 07:10:30] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 07:10:30] Updated last sync ID to: 192
+[2025-12-11 07:10:30] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 07:18:55] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 07:18:56] Last synced ID: 192
+[2025-12-11 07:18:56] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 07:18:56] Sending batch to API (1 logs)...
+[2025-12-11 07:18:56] Max log_id in batch: 193
+[2025-12-11 07:18:58] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 07:18:58] Updated last sync ID to: 193
+[2025-12-11 07:18:58] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 07:40:14] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 07:40:14] Last synced ID: 193
+[2025-12-11 07:40:14] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 07:40:14] Sending batch to API (1 logs)...
+[2025-12-11 07:40:14] Max log_id in batch: 194
+[2025-12-11 07:40:17] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 07:40:17] Updated last sync ID to: 194
+[2025-12-11 07:40:17] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 12:57:40] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 12:57:40] \033[0;31mNo internet connection\033[0m
+[2025-12-11 12:57:40] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-11 13:01:01] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 13:01:01] Last synced ID: 194
+[2025-12-11 13:01:01] \033[1;33mFound 2 new tamper logs to sync\033[0m
+[2025-12-11 13:01:01] Sending batch to API (2 logs)...
+[2025-12-11 13:01:01] Max log_id in batch: 196
+[2025-12-11 13:01:05] \033[0;32m✓ Successfully synced 2 tamper logs (batch)\033[0m
+[2025-12-11 13:01:05] Updated last sync ID to: 196
+[2025-12-11 13:01:05] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 13:59:12] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 13:59:12] Last synced ID: 196
+[2025-12-11 13:59:12] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 13:59:12] Sending batch to API (1 logs)...
+[2025-12-11 13:59:12] Max log_id in batch: 197
+[2025-12-11 13:59:15] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 13:59:15] Updated last sync ID to: 197
+[2025-12-11 13:59:15] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 13:59:21] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 13:59:21] Last synced ID: 197
+[2025-12-11 13:59:21] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 13:59:22] Sending batch to API (1 logs)...
+[2025-12-11 13:59:22] Max log_id in batch: 198
+[2025-12-11 13:59:23] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 13:59:23] Updated last sync ID to: 198
+[2025-12-11 13:59:23] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:01:07] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:01:07] Last synced ID: 198
+[2025-12-11 14:01:07] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:01:08] Sending batch to API (1 logs)...
+[2025-12-11 14:01:08] Max log_id in batch: 199
+[2025-12-11 14:01:10] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:01:10] Updated last sync ID to: 199
+[2025-12-11 14:01:10] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:02:15] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:02:15] Last synced ID: 199
+[2025-12-11 14:02:16] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:02:16] Sending batch to API (1 logs)...
+[2025-12-11 14:02:16] Max log_id in batch: 200
+[2025-12-11 14:02:17] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:02:17] Updated last sync ID to: 200
+[2025-12-11 14:02:17] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:21:19] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:21:19] Last synced ID: 200
+[2025-12-11 14:21:20] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:21:20] Sending batch to API (1 logs)...
+[2025-12-11 14:21:20] Max log_id in batch: 201
+[2025-12-11 14:21:23] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:21:23] Updated last sync ID to: 201
+[2025-12-11 14:21:23] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:35:41] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:35:41] Last synced ID: 201
+[2025-12-11 14:35:41] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:35:41] Sending batch to API (1 logs)...
+[2025-12-11 14:35:41] Max log_id in batch: 202
+[2025-12-11 14:35:44] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:35:44] Updated last sync ID to: 202
+[2025-12-11 14:35:44] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:36:28] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:36:28] Last synced ID: 202
+[2025-12-11 14:36:28] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:36:28] Sending batch to API (1 logs)...
+[2025-12-11 14:36:28] Max log_id in batch: 203
+[2025-12-11 14:36:30] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:36:30] Updated last sync ID to: 203
+[2025-12-11 14:36:30] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:36:37] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:36:37] Last synced ID: 203
+[2025-12-11 14:36:37] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:36:37] Sending batch to API (1 logs)...
+[2025-12-11 14:36:37] Max log_id in batch: 204
+[2025-12-11 14:36:38] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:36:38] Updated last sync ID to: 204
+[2025-12-11 14:36:38] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:41:28] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:41:28] Last synced ID: 204
+[2025-12-11 14:41:28] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:41:28] Sending batch to API (1 logs)...
+[2025-12-11 14:41:28] Max log_id in batch: 205
+[2025-12-11 14:41:30] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:41:30] Updated last sync ID to: 205
+[2025-12-11 14:41:30] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:42:04] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:42:04] Last synced ID: 205
+[2025-12-11 14:42:04] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:42:04] Sending batch to API (1 logs)...
+[2025-12-11 14:42:04] Max log_id in batch: 206
+[2025-12-11 14:42:06] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:42:06] Updated last sync ID to: 206
+[2025-12-11 14:42:06] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:42:15] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:42:15] Last synced ID: 206
+[2025-12-11 14:42:15] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:42:15] Sending batch to API (1 logs)...
+[2025-12-11 14:42:15] Max log_id in batch: 207
+[2025-12-11 14:42:17] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:42:17] Updated last sync ID to: 207
+[2025-12-11 14:42:17] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:42:23] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:42:23] Last synced ID: 207
+[2025-12-11 14:42:23] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:42:23] Sending batch to API (1 logs)...
+[2025-12-11 14:42:23] Max log_id in batch: 208
+[2025-12-11 14:42:25] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:42:25] Updated last sync ID to: 208
+[2025-12-11 14:42:25] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:48:53] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:48:53] Last synced ID: 208
+[2025-12-11 14:48:54] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:48:54] Sending batch to API (1 logs)...
+[2025-12-11 14:48:54] Max log_id in batch: 209
+[2025-12-11 14:48:56] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:48:56] Updated last sync ID to: 209
+[2025-12-11 14:48:56] \033[0;32mBatch sync completed!\033[0m
+[2025-12-11 14:48:59] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-11 14:48:59] Last synced ID: 209
+[2025-12-11 14:48:59] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-11 14:48:59] Sending batch to API (1 logs)...
+[2025-12-11 14:48:59] Max log_id in batch: 210
+[2025-12-11 14:49:01] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-11 14:49:01] Updated last sync ID to: 210
+[2025-12-11 14:49:01] \033[0;32mBatch sync completed!\033[0m
