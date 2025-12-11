@@ -2,17 +2,17 @@
 	"device_id":	1,
 	"type":	"Weighing machine",
 	"calibration_factor":	206.2655029296875,
-	"tare_offset":	85879,
+	"tare_offset":	0,
 	"zero_drift":	0,
 	"max_zero_drift_threshold":	5000,
 	"settling_time":	0.5,
 	"renewal_cycle":	67,
 	"safe_mode": false,
 	"location":	{
-		"latitude":	13.0827,
-		"longitude":	80.2707,
-		"city":	"Chennai",
-		"state":	"Tamil Nadu",
+		"latitude":	9.5275,
+		"longitude":	76.8228,
+		"city":	"Kanjirappally",
+		"state":	"Kerala",
 		"last_updated":	"2025-11-26"
 	}
 }
