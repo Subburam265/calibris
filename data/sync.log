@@ -2753,3 +2753,154 @@
 [2025-12-12 02:06:20] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
 [2025-12-12 02:06:20] Updated last sync ID to: 319
 [2025-12-12 02:06:20] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 02:29:19] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 02:29:19] Last synced ID: 319
+[2025-12-12 02:29:19] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 02:29:19] Sending batch to API (1 logs)...
+[2025-12-12 02:29:19] Max log_id in batch: 320
+[2025-12-12 02:29:22] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 02:29:22] Updated last sync ID to: 320
+[2025-12-12 02:29:22] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 02:38:20] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 02:38:20] Last synced ID: 320
+[2025-12-12 02:38:20] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 02:38:20] Sending batch to API (1 logs)...
+[2025-12-12 02:38:20] Max log_id in batch: 321
+[2025-12-12 02:38:22] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 02:38:22] Updated last sync ID to: 321
+[2025-12-12 02:38:22] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 02:43:03] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 02:43:03] Last synced ID: 321
+[2025-12-12 02:43:03] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 02:43:03] Sending batch to API (1 logs)...
+[2025-12-12 02:43:03] Max log_id in batch: 322
+[2025-12-12 02:43:05] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 02:43:05] Updated last sync ID to: 322
+[2025-12-12 02:43:05] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 02:52:53] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 02:52:53] Last synced ID: 322
+[2025-12-12 02:52:53] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 02:52:54] Sending batch to API (1 logs)...
+[2025-12-12 02:52:54] Max log_id in batch: 323
+[2025-12-12 02:52:55] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 02:52:55] Updated last sync ID to: 323
+[2025-12-12 02:52:55] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 03:02:30] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 03:02:30] Last synced ID: 323
+[2025-12-12 03:02:30] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 03:02:30] Sending batch to API (1 logs)...
+[2025-12-12 03:02:30] Max log_id in batch: 324
+[2025-12-12 03:02:32] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 03:02:32] Updated last sync ID to: 324
+[2025-12-12 03:02:32] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 03:08:31] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 03:08:31] Last synced ID: 324
+[2025-12-12 03:08:31] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 03:08:32] Sending batch to API (1 logs)...
+[2025-12-12 03:08:32] Max log_id in batch: 325
+[2025-12-12 03:08:34] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 03:08:34] Updated last sync ID to: 325
+[2025-12-12 03:08:34] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 03:28:04] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 03:28:04] Last synced ID: 325
+[2025-12-12 03:28:04] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 03:28:04] Sending batch to API (1 logs)...
+[2025-12-12 03:28:05] Max log_id in batch: 326
+[2025-12-12 03:28:06] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 03:28:06] Updated last sync ID to: 326
+[2025-12-12 03:28:06] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 03:58:39] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 03:58:39] Last synced ID: 326
+[2025-12-12 03:58:39] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 03:58:39] Sending batch to API (1 logs)...
+[2025-12-12 03:58:39] Max log_id in batch: 327
+[2025-12-12 03:58:41] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 03:58:41] Updated last sync ID to: 327
+[2025-12-12 03:58:41] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 04:03:05] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 04:03:05] Last synced ID: 327
+[2025-12-12 04:03:05] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 04:03:05] Sending batch to API (1 logs)...
+[2025-12-12 04:03:05] Max log_id in batch: 328
+[2025-12-12 04:03:06] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 04:03:06] Updated last sync ID to: 328
+[2025-12-12 04:03:06] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 04:06:15] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 04:06:15] Last synced ID: 328
+[2025-12-12 04:06:15] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 04:06:15] Sending batch to API (1 logs)...
+[2025-12-12 04:06:15] Max log_id in batch: 329
+[2025-12-12 04:06:17] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 04:06:17] Updated last sync ID to: 329
+[2025-12-12 04:06:17] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 04:11:28] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 04:11:28] Last synced ID: 329
+[2025-12-12 04:11:28] \033[1;33mFound 1 new tamper logs to sync\033[0m
+[2025-12-12 04:11:28] Sending batch to API (1 logs)...
+[2025-12-12 04:11:28] Max log_id in batch: 330
+[2025-12-12 04:11:31] \033[0;32m✓ Successfully synced 1 tamper logs (batch)\033[0m
+[2025-12-12 04:11:31] Updated last sync ID to: 330
+[2025-12-12 04:11:31] \033[0;32mBatch sync completed!\033[0m
+[2025-12-12 06:08:13] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 06:08:13] \033[0;31mNo internet connection\033[0m
+[2025-12-12 06:08:13] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 06:09:35] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 06:09:35] \033[0;31mNo internet connection\033[0m
+[2025-12-12 06:09:35] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 06:10:00] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 06:10:00] \033[0;31mNo internet connection\033[0m
+[2025-12-12 06:10:00] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 06:16:08] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 06:16:08] \033[0;31mNo internet connection\033[0m
+[2025-12-12 06:16:08] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 06:53:30] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 06:53:30] \033[0;31mNo internet connection\033[0m
+[2025-12-12 06:53:30] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 07:06:02] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 07:06:02] \033[0;31mNo internet connection\033[0m
+[2025-12-12 07:06:02] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 07:07:03] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 07:07:03] \033[0;31mNo internet connection\033[0m
+[2025-12-12 07:07:03] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 08:19:30] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 08:19:30] \033[0;31mNo internet connection\033[0m
+[2025-12-12 08:19:30] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 08:19:46] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 08:19:46] \033[0;31mNo internet connection\033[0m
+[2025-12-12 08:19:46] \033[0;31mSync aborted: No internet\033[0m
+                                                                                                                                                                                                        [2025-12-12 08:59:13] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 08:59:13] \033[0;31mNo internet connection\033[0m
+[2025-12-12 08:59:13] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 08:59:13] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 08:59:13] \033[0;31mNo internet connection\033[0m
+[2025-12-12 08:59:13] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 08:59:16] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 08:59:16] \033[0;31mNo internet connection\033[0m
+[2025-12-12 08:59:16] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 08:59:23] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 08:59:23] \033[0;31mNo internet connection\033[0m
+[2025-12-12 08:59:23] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 08:59:30] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 08:59:31] \033[0;31mNo internet connection\033[0m
+[2025-12-12 08:59:31] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 08:59:31] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 08:59:31] \033[0;31mNo internet connection\033[0m
+[2025-12-12 08:59:31] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 08:59:32] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 08:59:32] \033[0;31mNo internet connection\033[0m
+[2025-12-12 08:59:32] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 09:01:41] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 09:01:41] \033[0;31mNo internet connection\033[0m
+[2025-12-12 09:01:41] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 10:01:01] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 10:01:01] \033[0;31mNo internet connection\033[0m
+[2025-12-12 10:01:01] \033[0;31mSync aborted: No internet\033[0m
+                                                                                                                                                                                                        [2025-12-12 10:20:31] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 10:20:31] \033[0;31mNo internet connection\033[0m
+[2025-12-12 10:20:31] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 10:21:52] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 10:21:52] \033[0;31mNo internet connection\033[0m
+[2025-12-12 10:21:52] \033[0;31mSync aborted: No internet\033[0m
+[2025-12-12 10:22:19] \033[1;33mStarting BATCH tamper log sync...\033[0m
+[2025-12-12 10:22:19] \033[0;31mNo internet connection\033[0m
+[2025-12-12 10:22:19] \033[0;31mSync aborted: No internet\033[0m

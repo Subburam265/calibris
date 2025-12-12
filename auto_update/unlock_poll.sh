@@ -1,5 +1,5 @@
 #!/bin/bash
-# Calibris Remote Unlock Polling Service - CORRECTED VERSION
+# Calibris Remote Unlock Polling Service - FIXED VERSION
 # Works with manual tamper detection (no systemd services for tamper monitoring)
 
 # Configuration
@@ -7,7 +7,7 @@ API_BASE="https://unexploratory-harland-nontemporizingly.ngrok-free.dev/api"
 DEVICE_ID=1
 CONFIG_FILE="/home/pico/calibris/data/config.json"
 LOG_FILE="/home/pico/calibris/data/unlock_poll.log"
-POLL_INTERVAL=30  # seconds
+POLL_INTERVAL=10  # seconds
 
 # Colors for logging
 RED='\033[0;31m'
@@ -22,17 +22,18 @@ log() {
   echo -e "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-# Check if device is in safe mode
 is_safe_mode() {
   if [ ! -f "$CONFIG_FILE" ]; then
+    log "${RED}Config file not found: $CONFIG_FILE${NC}"
     return 1
   fi
 
-  SAFE_MODE=$(grep -o '"safe_mode"[[:space:]]:[[:space:]][^,}]*' "$CONFIG_FILE" | grep -o 'true\|false')
-
-  if [ "$SAFE_MODE" = "true" ]; then
+  # Simple check - works with any whitespace/tabs
+  if grep -q '"safe_mode":[[:space:]]*true' "$CONFIG_FILE"; then
+    log "${BLUE}[DEBUG] safe_mode = 'true'${NC}"
     return 0
   else
+    log "${BLUE}[DEBUG] safe_mode = 'false'${NC}"
     return 1
   fi
 }
@@ -122,34 +123,37 @@ exit_safe_mode() {
   log "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }
 
-# Poll backend for unlock command
+# Poll backend for unlock command - FIXED REGEX
 check_unlock_status() {
+  log "${BLUE}[DEBUG] Polling API...${NC}"
+  
   # Make HTTP request to backend
-  RESPONSE=$(curl -s \
+  RESPONSE=$(curl -s --max-time 10 \
     -H "ngrok-skip-browser-warning: true" \
-    "$API_BASE/devices/$DEVICE_ID/unlock-status" 2>/dev/null)
+    "$API_BASE/devices/$DEVICE_ID/unlock-status")
+  CURL_EXIT=$?
 
   # Check if curl succeeded
-  if [ $? -ne 0 ]; then
-    log "${RED}✗ Network error - unable to reach backend${NC}"
+  if [ $CURL_EXIT -ne 0 ] || [ -z "$RESPONSE" ]; then
+    log "${RED}✗ Network error - unable to reach backend (exit code: $CURL_EXIT)${NC}"
     return 1
   fi
 
-  # Check if unlock is pending
-  UNLOCK_PENDING=$(echo "$RESPONSE" | grep -o '"unlock_pending"[[:space:]]*:[[:space:]]*true')
+  log "${BLUE}[DEBUG] Response: $RESPONSE${NC}"
 
-  if [ -n "$UNLOCK_PENDING" ]; then
-    # Extract command details
-    COMMAND_ID=$(echo "$RESPONSE" | grep -o '"command_id"[[:space:]]:[[:space:]][0-9]' | grep -o '[0-9]')
+  # Check if unlock is pending
+  if echo "$RESPONSE" | grep -q '"unlock_pending"[[:space:]]*:[[:space:]]*true'; then
+    # Extract command details - FIXED REGEX
+    COMMAND_ID=$(echo "$RESPONSE" | grep -o '"command_id"[[:space:]]:[[:space:]][0-9]' | grep -o '[0-9]$')
     OFFICER_ID=$(echo "$RESPONSE" | grep -o '"officer_id"[[:space:]]:[[:space:]]"[^"]"' | sed 's/."\([^"]\)"./\1/')
     REASON=$(echo "$RESPONSE" | grep -o '"reason"[[:space:]]:[[:space:]]"[^"]"' | sed 's/."\([^"]\)"./\1/')
 
     log "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     log "${GREEN}🔓 UNLOCK COMMAND RECEIVED${NC}"
     log "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    log "   Command ID: ${BLUE}$COMMAND_ID${NC}"
-    log "   Officer: ${BLUE}$OFFICER_ID${NC}"
-    log "   Reason: ${BLUE}$REASON${NC}"
+    log "   Command ID: ${BLUE}${COMMAND_ID:-N/A}${NC}"
+    log "   Officer: ${BLUE}${OFFICER_ID:-N/A}${NC}"
+    log "   Reason: ${BLUE}${REASON:-N/A}${NC}"
     log "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
     # Exit safe mode
@@ -160,13 +164,16 @@ check_unlock_status() {
 
     # Confirm unlock to backend
     log "${BLUE}Confirming unlock to backend...${NC}"
-    CONFIRM_RESPONSE=$(curl -s -X POST "$API_BASE/devices/$DEVICE_ID/unlock-confirm" \
+    CONFIRM_RESPONSE=$(curl -s --max-time 10 -X POST \
+      "$API_BASE/devices/$DEVICE_ID/unlock-confirm" \
       -H "Content-Type: application/json" \
       -H "ngrok-skip-browser-warning: true" \
-      -d "{\"command_id\": $COMMAND_ID}" 2>/dev/null)
+      -d "{\"command_id\": ${COMMAND_ID:-0}}")
+
+    log "${BLUE}[DEBUG] Confirm response: $CONFIRM_RESPONSE${NC}"
 
     # Check if confirmation succeeded
-    if echo "$CONFIRM_RESPONSE" | grep -q '"new_status"[[:space:]]:[[:space:]]"online"'; then
+    if echo "$CONFIRM_RESPONSE" | grep -q '"new_status".*"online"'; then
       log "${GREEN}✅ Unlock confirmed - Device status updated to ONLINE${NC}"
     else
       log "${YELLOW}⚠  Unlock executed but confirmation failed${NC}"
@@ -175,42 +182,41 @@ check_unlock_status() {
 
     return 0
   else
-    # No unlock pending - silent (only log once per hour to avoid spam)
-    CURRENT_HOUR=$(date +%H)
-    LAST_LOG_HOUR=$(cat /tmp/unlock_poll_hour 2>/dev/null || echo "")
-
-    if [ "$CURRENT_HOUR" != "$LAST_LOG_HOUR" ]; then
-      log "${BLUE}ℹ No unlock command pending (device in safe mode)${NC}"
-      echo "$CURRENT_HOUR" > /tmp/unlock_poll_hour
-    fi
-
+    # No unlock pending
+    log "${BLUE}ℹ No unlock command pending${NC}"
     return 1
   fi
 }
 
-# Main loop
-log "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-log "${GREEN}🚀 Calibris Unlock Polling Service Started${NC}"
-log "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-log "   Device ID: $DEVICE_ID"
-log "   API: $API_BASE"
-log "   Poll Interval: ${POLL_INTERVAL}s"
-log "   Config: $CONFIG_FILE"
-log "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+# Main entry point
+main() {
+  log "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  log "${GREEN}🚀 Calibris Unlock Polling Service Started${NC}"
+  log "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  log "   Device ID: $DEVICE_ID"
+  log "   API: $API_BASE"
+  log "   Poll Interval: ${POLL_INTERVAL}s"
+  log "   Config: $CONFIG_FILE"
+  log "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-# Check initial state
-if is_safe_mode; then
-  log "${YELLOW}⚠  Device is currently in SAFE MODE - will poll for unlock commands${NC}"
-else
-  log "${GREEN}✓ Device is currently ONLINE - monitoring for safe mode entry${NC}"
-fi
-
-while true; do
-  # Only poll if device is in safe mode
+  # Check initial state
   if is_safe_mode; then
-    check_unlock_status
+    log "${YELLOW}⚠  Device is currently in SAFE MODE - will poll for unlock commands${NC}"
+  else
+    log "${GREEN}✓ Device is currently ONLINE - monitoring for safe mode entry${NC}"
   fi
 
-  # Wait before next poll
-  sleep $POLL_INTERVAL
-done
+  # Main loop
+  while true; do
+    # Only poll if device is in safe mode
+    if is_safe_mode; then
+      check_unlock_status
+    fi
+
+    # Wait before next poll
+    sleep $POLL_INTERVAL
+  done
+}
+
+# Run main function
+main
